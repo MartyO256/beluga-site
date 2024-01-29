@@ -8,7 +8,8 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		paths: {
-			base: '/beluga'
+			base: '/beluga',
+			relative: false
 		}
 	}
 };
