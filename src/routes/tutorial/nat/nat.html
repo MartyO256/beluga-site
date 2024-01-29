@@ -1,0 +1,9 @@
+<pre><code><span id="lf-type-nat" class="constant lf-type-constant">nat</span> : <span class="keyword keyword-type">type</span>.
+<span id="lf-term-z" class="constant lf-term-constant">z</span> : <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>.
+<span id="lf-term-succ" class="constant lf-term-constant">succ</span> : <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>.
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-add" class="constant computation-program">add</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">x</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">y</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">x</span> <span class="keyword keyword-of">of</span>
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-z">z</a></span>] ⇒ <span class="variable computation-variable">y</span>
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-succ">succ</a></span> <span class="variable meta-variable">N</span>] ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="variable meta-variable">R</span>] = <span class="constant computation-program"><a href="#theorem-add">add</a></span> [ ⊢ <span class="variable meta-variable">N</span>] <span class="variable computation-variable">y</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-succ">succ</a></span> <span class="variable meta-variable">R</span>];</code></pre>

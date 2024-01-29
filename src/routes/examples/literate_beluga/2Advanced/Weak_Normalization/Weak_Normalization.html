@@ -1,0 +1,212 @@
+<div class="documentation">
+  <h1 id="Weak-head-normalization-for-simply-typed-lambda-calculus">
+    Weak head normalization for simply-typed lambda calculus
+  </h1>
+
+  <p>
+    This example follows the proof presented in
+    <a href="http://www.cs.mcgill.ca/~bpientka/papers/lfmtp13.pdf">
+      Cave and Pientka[2013]</a
+    >.
+  </p>
+  <p>First, let's define a simply typed λ-calculus with one type:</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-tp" class="constant lf-type-constant">tp</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-b" class="constant lf-term-constant">b</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>
+| <span id="lf-term-arr" class="constant lf-term-constant">arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-tp">tp</a></span> T.</span>
+
+<span id="lf-type-tm" class="constant lf-type-constant">tm</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span>.
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-tm">tm</a></span> E.</span>
+
+<span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span>) → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">T</span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">S</span>.
+
+<span id="lf-term-lam" class="constant lf-term-constant">lam</span> : (<span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">T</span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">S</span>) → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span>).
+
+<span id="lf-term-c" class="constant lf-term-constant">c</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="constant lf-term-constant"><a href="#lf-term-b">b</a></span>.</code></pre>
+
+<div class="documentation">
+  <p>
+    The type <code>tm</code> defines our family of simply-typed lambda terms
+    indexed by their type as an LF signature. In typical higher-order abstract
+    syntax (HOAS) fashion, lambda abstraction takes a function representing the
+    abstraction of a term over a variable. There is no case for variables, as
+    they are treated implicitly in HOAS.
+  </p>
+  <p>
+    We now encode the step relation of the operational semantics. In particular,
+    we create the <code>step</code> type indexed by two terms that represent
+    each step of the computation.
+  </p>
+</div>
+
+<pre><code><span id="lf-type-step" class="constant lf-type-constant">step</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="keyword keyword-type">type</span>.
+
+<span id="lf-term-beta" class="constant lf-term-constant">beta</span> : <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">M</span>) <span class="variable lf-variable">N</span>) (<span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span>).
+
+<span id="lf-term-stepapp" class="constant lf-term-constant">stepapp</span> : <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M'</span> → <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M'</span> <span class="variable lf-variable">N</span>).</code></pre>
+
+<div class="documentation">
+  <p>
+    Notice how the <code>beta</code> rule re-uses the LF notion of substitution
+    by computing the application of <code>M</code> to <code>N</code>. <br />
+  </p>
+  <p>Finally, we define:</p>
+  <ul>
+    <li>a multiple step reduction <code>mstep</code>.</li>
+    <li>values <code>val</code></li>
+    <li>
+      <code>halts</code> to encode that a term halts if it steps into a value.
+    </li>
+  </ul>
+</div>
+
+<pre><code><span id="lf-type-mstep" class="constant lf-type-constant">mstep</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="keyword keyword-type">type</span>.
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-mstep">mstep</a></span> S.</span>
+
+<span id="lf-term-refl" class="constant lf-term-constant">refl</span> : <span class="constant lf-type-constant"><a href="#lf-type-mstep">mstep</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M</span>.
+
+<span id="lf-term-onestep" class="constant lf-term-constant">onestep</span> : <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M'</span> → <span class="constant lf-type-constant"><a href="#lf-type-mstep">mstep</a></span> <span class="variable lf-variable">M'</span> <span class="variable lf-variable">M''</span> → <span class="constant lf-type-constant"><a href="#lf-type-mstep">mstep</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M''</span>.
+
+<span id="lf-type-val" class="constant lf-type-constant">val</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="keyword keyword-type">type</span>.
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-val">val</a></span> V.</span>
+
+<span id="lf-term-val%2Fc" class="constant lf-term-constant">val/c</span> : <span class="constant lf-type-constant"><a href="#lf-type-val">val</a></span> <span class="constant lf-term-constant"><a href="#lf-term-c">c</a></span>.
+
+<span id="lf-term-val%2Flam" class="constant lf-term-constant">val/lam</span> : <span class="constant lf-type-constant"><a href="#lf-type-val">val</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">M</span>).
+
+<span id="lf-type-halts" class="constant lf-type-constant">halts</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">A</span> → <span class="keyword keyword-type">type</span>.
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-halts">halts</a></span> H.</span>
+
+<span id="lf-term-halts%2Fm" class="constant lf-term-constant">halts/m</span> : <span class="constant lf-type-constant"><a href="#lf-type-mstep">mstep</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M'</span> → <span class="constant lf-type-constant"><a href="#lf-type-val">val</a></span> <span class="variable lf-variable">M'</span> → <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable lf-variable">M</span>.</code></pre>
+
+<div class="documentation">
+  <h2 id="Reducibility">Reducibility</h2>
+
+  <p>
+    Reducibility cannot be directly encoded at the LF layer, since it involves a
+    strong, computational function space. Hence we move to the computation layer
+    of Beluga, and employ an indexed recursive type. Contextual LF objects and
+    contexts which are embedded into computation-level types and programs are
+    written inside <code>[ ]</code>.
+  </p>
+</div>
+
+<pre><code><span class="keyword keyword-stratified">stratified</span> <span id="strat-comp-type-Reduce" class="constant computation-stratified-type-constant">Reduce</span> : {<span class="variable meta-variable">A</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>)} {<span class="variable meta-variable">M</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>)} <span class="keyword keyword-ctype">ctype</span> =
+| <span id="comp-const-I" class="constant computation-constructor">I</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M</span>) → <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-b">b</a></span>] [ ⊢ <span class="variable meta-variable">M</span>]
+| <span id="comp-const-Arr" class="constant computation-constructor">Arr</span> :
+  ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M</span>) →
+    ({<span class="variable meta-variable">N</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>)} <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">A</span>] [ ⊢ <span class="variable meta-variable">N</span>] → <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">B</span>] [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">N</span>]) →
+      <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable meta-variable">A</span> <span class="variable meta-variable">B</span>] [ ⊢ <span class="variable meta-variable">M</span>];</code></pre>
+
+<div class="documentation">
+  <p>
+    A term of type <code>i</code> is reducible if it halts, and a
+    <code>term M</code> of type <code>arr A B</code> is reducible if it halts,
+    and moreover for every reducible <code>N</code> of type <code>A</code>, the
+    application <code>app M N</code> is reducible. We write
+    <code>{N:[ |- tm A]}</code> for explicit Π-quantification over
+    <code>N</code>, a closed term of type <code>A</code>. To the left of the
+    turnstile in <code>[|- tm A]</code> is where one writes the context the term
+    is defined in – in this case, it is empty.
+  </p>
+  <p>
+    In this definition, the arrows represent the usual computational function
+    space, not the weak function space of LF. We note that this definition is
+    not (strictly) positive, since <code>Reduce</code> appears to the left of an
+    arrow in the <code>Arr</code> case. Allowing unrestricted such definitions
+    destroys the soundness of our system. Here we note that this definition is
+    stratified by the type: the recursive occurrences of <code>Reduce</code> are
+    at types <code>A</code> and <code>B</code> which are smaller than
+    <code>arr A B</code>. <code>Reduce</code> is defined by induction on the
+    type of the reducible term(additionally this is why we cannot leave the type
+    implicit).
+  </p>
+  <p>
+    Now, we need to prove some more or less trivial lemmas that are usually
+    omitted in paper presentations.
+  </p>
+  <p>
+    First, we prove that halts is closed under expansion in the
+    <code>halts_step</code> lemma.
+  </p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-halts_step" class="constant computation-program">halts_step</span> : {<span class="variable meta-variable">S</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">M'</span>)} ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M'</span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M</span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">S</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">h</span> ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-halts%2Fm">halts/m</a></span> <span class="variable meta-variable">MS'</span> <span class="variable meta-variable">V</span>] = <span class="variable computation-variable">h</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-halts%2Fm">halts/m</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-onestep">onestep</a></span> <span class="variable meta-variable">S</span> <span class="variable meta-variable">MS'</span>) <span class="variable meta-variable">V</span>];</code></pre>
+
+<div class="documentation">
+  <p>
+    Next we prove closure of Reduce under expansion. This follows the
+    handwritten proof, proceeding by induction on the type A which is an
+    implicit argument. In the base case we appeal to <code>halts_step</code>,
+    while in the <code>Arr</code> case we must also appeal to the induction
+    hypothesis at the range type, going inside the function position of
+    applications.
+  </p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-bwd_closed" class="constant computation-program">bwd_closed</span> :
+  {<span class="variable meta-variable">S</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">M'</span>)} <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">T</span>] [ ⊢ <span class="variable meta-variable">M'</span>] → <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">T</span>] [ ⊢ <span class="variable meta-variable">M</span>] =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">MS</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">r</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">r</span> <span class="keyword keyword-of">of</span>
+  | <span class="constant computation-constructor"><a href="#comp-const-I">I</a></span> <span class="variable computation-variable">ha</span> ⇒ <span class="constant computation-constructor"><a href="#comp-const-I">I</a></span> (<span class="constant computation-program"><a href="#theorem-halts_step">halts_step</a></span> [ ⊢ <span class="variable meta-variable">MS</span>] <span class="variable computation-variable">ha</span>)
+  | <span class="constant computation-constructor"><a href="#comp-const-Arr">Arr</a></span> <span class="variable computation-variable">ha</span> <span class="variable computation-variable">f</span> ⇒
+    <span class="constant computation-constructor"><a href="#comp-const-Arr">Arr</a></span> (<span class="constant computation-program"><a href="#theorem-halts_step">halts_step</a></span> [ ⊢ <span class="variable meta-variable">MS</span>] <span class="variable computation-variable">ha</span>) (<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">N</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">rn</span> ⇒
+      <span class="constant computation-program"><a href="#theorem-bwd_closed">bwd_closed</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-stepapp">stepapp</a></span> <span class="variable meta-variable">MS</span>] (<span class="variable computation-variable">f</span> [ ⊢ <span class="variable meta-variable">N</span>] <span class="variable computation-variable">rn</span>));</code></pre>
+
+<div class="documentation">
+  <p>
+    The trivial fact that reducible terms halt has a corresponding trivial
+    proof, analyzing the construction of the the proof of 'Reduce[|- T] [|- M]'
+  </p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-reduce_halts" class="constant computation-program">reduce_halts</span> : <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">T</span>] [ ⊢ <span class="variable meta-variable">M</span>] → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">r</span> ⇒ <span class="keyword keyword-case">case</span> <span class="variable computation-variable">r</span> <span class="keyword keyword-of">of</span>
+       | <span class="constant computation-constructor"><a href="#comp-const-I">I</a></span> <span class="variable computation-variable">h</span> ⇒ <span class="variable computation-variable">h</span>
+       | <span class="constant computation-constructor"><a href="#comp-const-Arr">Arr</a></span> <span class="variable computation-variable">h</span> <span class="variable computation-variable">f</span> ⇒ <span class="variable computation-variable">h</span>;</code></pre>
+
+<div class="documentation">
+  <h2 id="Reducibility-of-substitutions">Reducibility of substitutions</h2>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-ctx" class="constant context-schema">ctx</span> = <span class="keyword keyword-block">block</span> <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable lf-variable">T</span>;
+
+<span class="keyword keyword-inductive">inductive</span> <span id="ind-comp-type-RedSub" class="constant computation-inductive-type-constant">RedSub</span> : {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>} {<span class="variable meta-variable">$σ</span> : $( ⊢ <span class="variable context-variable">g</span>)} <span class="keyword keyword-ctype">ctype</span> =
+| <span id="comp-const-Nil" class="constant computation-constructor">Nil</span> : <span class="constant computation-inductive-type-constant"><a href="#ind-comp-type-RedSub">RedSub</a></span> [] $[ ⊢ ]
+| <span id="comp-const-Dot" class="constant computation-constructor">Dot</span> :
+  <span class="constant computation-inductive-type-constant"><a href="#ind-comp-type-RedSub">RedSub</a></span> [<span class="variable context-variable">g</span>] $[ ⊢ <span class="variable substitution-variable">$σ</span>[]] →
+    <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">A</span>] [ ⊢ <span class="variable meta-variable">M</span>] → <span class="constant computation-inductive-type-constant"><a href="#ind-comp-type-RedSub">RedSub</a></span> [<span class="variable context-variable">g</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>[]] $[ ⊢ <span class="variable substitution-variable">$σ</span>, <span class="variable meta-variable">M</span>];
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-lookup" class="constant computation-program">lookup</span> :
+  {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>}
+    {<span class="variable meta-variable">#p</span> : #(<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>[])} <span class="constant computation-inductive-type-constant"><a href="#ind-comp-type-RedSub">RedSub</a></span> [<span class="variable context-variable">g</span>] $[ ⊢ <span class="variable substitution-variable">$σ</span>[]] → <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">A</span>] [ ⊢ <span class="variable parameter-variable">#p</span>[<span class="variable substitution-variable">$σ</span>]] =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">g</span> ⇒ <span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">#p</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">rs</span> ⇒
+  <span class="keyword keyword-case">case</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#p</span>] <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">g'</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span> ⊢ <span class="variable lf-variable">x</span>] ⇒ <span class="keyword keyword-let">let</span> <span class="constant computation-constructor"><a href="#comp-const-Dot">Dot</a></span> <span class="variable computation-variable">rs'</span> <span class="variable computation-variable">rN</span> = <span class="variable computation-variable">rs</span> <span class="keyword keyword-in">in</span> <span class="variable computation-variable">rN</span>
+  | [<span class="variable context-variable">g'</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span> ⊢ <span class="variable parameter-variable">#q</span>[…]] ⇒ <span class="keyword keyword-let">let</span> <span class="constant computation-constructor"><a href="#comp-const-Dot">Dot</a></span> <span class="variable computation-variable">rs'</span> <span class="variable computation-variable">rN</span> = <span class="variable computation-variable">rs</span> <span class="keyword keyword-in">in</span> <span class="constant computation-program"><a href="#theorem-lookup">lookup</a></span> [<span class="variable context-variable">g'</span>] [<span class="variable context-variable">g'</span> ⊢ <span class="variable parameter-variable">#q</span>] <span class="variable computation-variable">rs'</span>;</code></pre>
+
+<div class="documentation"><h2 id="Main-theorem">Main theorem</h2></div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-main" class="constant computation-program">main</span> :
+  {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>}
+    {<span class="variable meta-variable">M</span> : (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>[])} <span class="constant computation-inductive-type-constant"><a href="#ind-comp-type-RedSub">RedSub</a></span> [<span class="variable context-variable">g</span>] $[ ⊢ <span class="variable substitution-variable">$σ</span>[]] → <span class="constant computation-stratified-type-constant"><a href="#strat-comp-type-Reduce">Reduce</a></span> [ ⊢ <span class="variable meta-variable">A</span>] [ ⊢ <span class="variable meta-variable">M</span>[<span class="variable substitution-variable">$σ</span>]] =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">g</span> ⇒ <span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">M</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">rs</span> ⇒
+  <span class="keyword keyword-case">case</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">M</span>] <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#p</span>] ⇒ <span class="constant computation-program"><a href="#theorem-lookup">lookup</a></span> [<span class="variable context-variable">g</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#p</span>] <span class="variable computation-variable">rs</span>
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable meta-variable">M1</span>)] ⇒
+    <span class="constant computation-constructor"><a href="#comp-const-Arr">Arr</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-halts%2Fm">halts/m</a></span> <span class="constant lf-term-constant"><a href="#lf-term-refl">refl</a></span> <span class="constant lf-term-constant"><a href="#lf-term-val%2Flam">val/lam</a></span>] (<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">N</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">rN</span> ⇒
+      <span class="constant computation-program"><a href="#theorem-bwd_closed">bwd_closed</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-beta">beta</a></span>] (<span class="constant computation-program"><a href="#theorem-main">main</a></span> [<span class="variable context-variable">g</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> _] [<span class="variable context-variable">g</span>, <span class="variable lf-variable">x</span> ⊢ <span class="variable meta-variable">M1</span>] (<span class="constant computation-constructor"><a href="#comp-const-Dot">Dot</a></span> <span class="variable computation-variable">rs</span> <span class="variable computation-variable">rN</span>)))
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable meta-variable">M1</span> <span class="variable meta-variable">M2</span>] ⇒ <span class="keyword keyword-let">let</span> <span class="constant computation-constructor"><a href="#comp-const-Arr">Arr</a></span> <span class="variable computation-variable">ha</span> <span class="variable computation-variable">f</span> = <span class="constant computation-program"><a href="#theorem-main">main</a></span> [<span class="variable context-variable">g</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">M1</span>] <span class="variable computation-variable">rs</span> <span class="keyword keyword-in">in</span>
+    <span class="variable computation-variable">f</span> _ (<span class="constant computation-program"><a href="#theorem-main">main</a></span> [<span class="variable context-variable">g</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">M2</span>] <span class="variable computation-variable">rs</span>)
+  | [<span class="variable context-variable">g'</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-c">c</a></span>] ⇒ <span class="constant computation-constructor"><a href="#comp-const-I">I</a></span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-halts%2Fm">halts/m</a></span> <span class="constant lf-term-constant"><a href="#lf-term-refl">refl</a></span> <span class="constant lf-term-constant"><a href="#lf-term-val%2Fc">val/c</a></span>];
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-weakNorm" class="constant computation-program">weakNorm</span> : {<span class="variable meta-variable">M</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> <span class="variable meta-variable">A</span>)} ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-halts">halts</a></span> <span class="variable meta-variable">M</span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">M</span> ⇒ <span class="constant computation-program"><a href="#theorem-reduce_halts">reduce_halts</a></span> (<span class="constant computation-program"><a href="#theorem-main">main</a></span> [] [ ⊢ <span class="variable meta-variable">M</span>] <span class="constant computation-constructor"><a href="#comp-const-Nil">Nil</a></span>);</code></pre>
