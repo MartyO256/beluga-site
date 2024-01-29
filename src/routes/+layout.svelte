@@ -17,8 +17,12 @@
 			href: `${base}/#installation`
 		},
 		{
-			display: 'Docs',
+			display: 'Documentation',
 			href: `${base}/documentation`
+		},
+		{
+			display: 'Case Studies',
+			href: `${base}/casestudies`
 		},
 		{
 			display: 'People',
