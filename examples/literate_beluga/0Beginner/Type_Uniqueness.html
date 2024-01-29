@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/8.y8LY4BZe.js"><title>Type Uniqueness for the Simply-typed Lambda-calculus</title><!-- HEAD_svelte-1yb712t_START --><!-- HEAD_svelte-1yb712t_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <!-- HTML_TAG_START --><div class="documentation">
+	<h1 id="Type-Uniqueness-for-the-Simply-typed-Lambda-calculus">
+		Type Uniqueness for the Simply-typed Lambda-calculus
+	</h1>
+
+	<p>
+		We prove that every lambda term has a unique type. Type uniqueness is also a benchmark in
+		<a href="https://github.com/pientka/ORBI">ORBI</a>, Open challenge problem Repository for
+		systems reasoning with Binders. For a detailed description of the proof and a discussion
+		regarding other systems see
+		<a target="_blank" href="/beluga-site/orbi-jar.pdf">(Felty et al, 2014)</a>.
+	</p>
+	<h2 id="Syntax-Types-and-Lambda-terms">Syntax: Types and Lambda-terms</h2>
+
+	<p>
+		We first represent the simply-typed lambda-calculus in the logical framework LF: the LF type
+		<code>tp</code> describes the types of our simply typed lambda-calculus, and the LF type
+		<code>tm</code> characterizes the terms of the lambda-calculus.
+	</p>
+	<p>
+		The LF type tp has two constructors, <code>nat</code> and <code>arr</code>, corresponding to the
+		types <code>nat</code> and <code>arr T S</code>, respectively. Since <code>arr</code> is a
+		constructor which takes in two arguments, its type is <code>tp -&gt; tp -&gt; tp</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-tp" class="constant lf-type-constant">tp</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-arr" class="constant lf-term-constant">arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>
+| <span id="lf-term-nat" class="constant lf-term-constant">nat</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>;</code></pre>
+
+<div class="documentation">
+	<p>
+		The LF type <code>tm</code> also has two constructors. The constructor <code>app</code> takes as
+		input two objects of type <code>tm</code> and allows us to construct an object of type
+		<code>tm</code>. The constructor for lambda-terms also takes two arguments as input; it first
+		takes an object of type <code>tp</code> for the type annotation and the body of the abstraction
+		is second. We use higher-order abstract syntax to represent the object-level binding of the
+		variable <code>x</code> in the body <code>M</code>. Accordingly, the body of the abstraction is
+		represented by the type <code>(tm -&gt; tm)</code>. For example,
+		<code>lam x:(arr nat nat) . lam y:nat . app x y</code> is represented by
+		<code>lam (arr nat nat) \x.lam nat \y.app x y</code>. This encoding has several well-known
+		advantages: First, the encoding naturally supports alpha-renaming of bound variables, which is
+		inherited from the logical framework. Second, the encoding elegantly supports substitution for
+		bound variables which reduces to beta-reduction in the logical framework LF.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-term" class="constant lf-type-constant">term</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-lam" class="constant lf-term-constant">lam</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → (<span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>
+| <span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>;</code></pre>
+
+<div class="documentation">
+	<h2 id="Typing-Rules">Typing Rules</h2>
+
+	<p>
+		We describe typing judgment using the type family
+		<code>has_type</code> which relates terms <code>tm</code> and types <code>tp</code>. The
+		inference rules for lambda-abstraction and application are encoded as <code>h_lam</code> and
+		<code>h_app</code>, respectively.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-hastype" class="constant lf-type-constant">hastype</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-h_lam" class="constant lf-term-constant">h_lam</span> :
+  ({x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">T1</span> → <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) <span class="variable lf-variable">T2</span>) →
+    <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">M</span>) (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span>)
+| <span id="lf-term-h_app" class="constant lf-term-constant">h_app</span> : <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable lf-variable">M1</span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T2</span> <span class="variable lf-variable">T</span>) → <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable lf-variable">M2</span> <span class="variable lf-variable">T2</span> → <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">M2</span>) <span class="variable lf-variable">T</span>;</code></pre>
+
+<div class="documentation">
+	<h2 id="Equality">Equality</h2>
+	<p>
+		Since Beluga does not support equality types, we implement equality by reflexivity using the
+		type family <code>equal</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-equal" class="constant lf-type-constant">equal</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-e_ref" class="constant lf-term-constant">e_ref</span> : <span class="constant lf-type-constant"><a href="#lf-type-equal">equal</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">T</span>;</code></pre>
+
+<div class="documentation">
+	<h2 id="Schema">Schema</h2>
+
+	<p>
+		The schema <code>txG</code> describes a context containing assumptions <code>x:tm</code>, each
+		associated with a typing assumption <code>hastype x t</code> for some type <code>t</code>.
+		Formally, we are using a dependent product Η (used only in contexts) to tie <code>x</code> to
+		<code>hastype x t</code>. We thus do not need to establish separately that for every variable
+		there is a unique typing assumption: this is inherent in the definition of <code>txG</code>. The
+		schema classifies well-formed contexts and checking whether a context satisfies a schema will be
+		part of type checking. As a consequence, type checking will ensure that we are manipulating only
+		well-formed contexts, that later declarations overshadow previous declarations, and that all
+		declarations are of the specified form.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-xtG" class="constant context-schema">xtG</span> = <span class="keyword keyword-some">some</span> [<span class="variable lf-variable">t</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>] <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">t</span>);</code></pre>
+
+<div class="documentation">
+	<h2 id="Typing-uniqueness-proof">Typing uniqueness proof</h2>
+
+	<p>
+		Our final proof of type uniqueness <code>rec unique</code> proceeds by case analysis on the
+		first derivation. Accordingly, the recursive function pattern-matches on the first derivation
+		<code>d</code> which has type <code>[g |- hastype M T]</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-unique" class="constant computation-program">unique</span> :
+  (<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-xtG">xtG</a></span>) (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">T</span>[]) → (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">T'</span>[]) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-equal">equal</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">T'</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">d</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">f</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">d</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-h_app">h_app</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-h_app">h_app</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>] = <span class="variable computation-variable">f</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-e_ref">e_ref</a></span>] = <span class="constant computation-program"><a href="#theorem-unique">unique</a></span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-e_ref">e_ref</a></span>]
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-h_lam">h_lam</a></span> (\x. \u. <span class="variable meta-variable">D</span>)] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-h_lam">h_lam</a></span> (\x. \u. <span class="variable meta-variable">F</span>)] = <span class="variable computation-variable">f</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-e_ref">e_ref</a></span>] =
+      <span class="constant computation-program"><a href="#theorem-unique">unique</a></span> [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-hastype">hastype</a></span> <span class="variable lf-variable">x</span> _) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.x, <span class="variable lf-variable">b</span>.u]]
+        [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">b</span>.x, <span class="variable lf-variable">b</span>.u]] <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-e_ref">e_ref</a></span>]
+  | [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#q</span>.2] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#r</span>.2] = <span class="variable computation-variable">f</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-e_ref">e_ref</a></span>];</code></pre>
+
+<div class="documentation">
+	<p>Consider each case individually.</p>
+	<ul>
+		<li>
+			<p>
+				<strong>Application case.</strong> If the first derivation <code>d</code> concludes with
+				<code>h_app</code>, it matches the pattern <code>[g |- h_app D1 D2]</code>, and forms a
+				contextual object in the context <code>g</code> of type <code>[g |- hastype M T'[]]</code>.
+				<code>D1</code> corresponds to the first premise of the typing rule for applications with
+				contextual type <code>[g |- hastype M1 (arr T'[] T[])]</code>. Using a let-binding, we
+				invert the second argument, the derivation <code>f</code> which must have type
+				<code>[g |- hastype (app M1 M2) T[]]</code>. <code>F1</code> corresponds to the first
+				premise of the typing rule for applications and has the contextual type
+				<code>[g |- hastype M1 (arr S'[] S[])]</code>. The appeal to the induction hypothesis using
+				<code>D1</code> and <code>F1</code> in the on-paper proof corresponds to the recursive call
+				<code>unique [g |- D1] [g |- F1]</code>. Note that while <code>unique</code>’s type says it
+				takes a context variable <code>(g:xtG)</code>, we do not pass it explicitly; Beluga infers
+				it from the context in the first argument passed. The result of the recursive call is a
+				contextual object of type <code>[ |- eq (arr T1 T2) (arr S1 S2)]</code>. The only rule that
+				could derive such an object is <code>e_ref</code>, and pattern matching establishes that
+				<code>arr T T' = arr S S’</code> and hence <code>T = S and T' = S’</code>.
+			</p>
+		</li>
+		<li>
+			<p>
+				<strong>Lambda case.</strong> If the first derivation <code>d</code> concludes with
+				<code>h_lam</code>, it matches the pattern <code>[g |- h_lam (\x.\u. D u)]</code>, and is a
+				contextual object in the context <code>g</code> of type
+				<code>hastype (lam T[] M) (arr T[] T'[])</code>. Pattern matching—through a
+				let-binding—serves to invert the second derivation <code>f</code>, which must have been by
+				<code>h_lam</code> with a subderivation <code>F</code> to reach
+				<code>hastype M S[]</code> that can use <code>x, u:hastype x T[]</code>, and assumptions
+				from <code>g</code>.
+				<br />
+				The use of the induction hypothesis on <code>D</code> and <code>F</code> in a paper proof
+				corresponds to the recursive call to <code>unique</code>. To appeal to the induction
+				hypothesis, we need to extend the context by pairing up <code>x</code> and the typing
+				assumption <code>hastype x T[]</code>. This is accomplished by creating the declaration
+				<code>b: block x:term, u:hastype x T[]</code>. In the code, we wrote an underscore
+				<code>_</code> instead of <code>T[]</code>, which tells Beluga to reconstruct it since we
+				cannot write <code>T[]</code> there without binding it by explicitly giving the type of
+				<code>D</code>. To retrieve <code>x</code> we take the first projection <code>b.x</code>,
+				and to retrieve <code>x</code>’s typing assumption we take the second projection
+				<code>b.u</code>.
+				<br />
+				Now we can appeal to the induction hypothesis using
+				<code>D1[.., b.x, b.u]</code> and <code>F1[.., b.x, b.u]</code> in the context
+				<code>g, b: block x:term, u:hastype x S[]</code>. From the i.h. we get a contextual object,
+				a closed derivation of <code>[|- eq (arr T T') (arr S S’)]</code>. The only rule that could
+				derive this is ref, and pattern matching establishes that <code>S</code> must equal
+				<code>S’</code>, since we must have <code>arr T S = arr T1 S’</code>. Therefore, there is a
+				proof of <code>[ |- equal S S’]</code>, and we can finish with the reflexivity rule
+				<code>e_ref</code>.
+			</p>
+		</li>
+		<li>
+			<p>
+				<strong>Variable case.</strong> Since our context consists of blocks containing variables of
+				type <code>tm</code> and assumptions <code>hastype x T[]</code>, we pattern match on
+				<code>[g |- #p.2]</code>, i.e., we project out the second argument of the block. By the
+				given assumptions, we know that <code>[g |- #p.2]</code> has type
+				<code>[g |- hastype #p.1 T[]]</code>, because <code>#p</code> has type
+				<code>[g |- block x:tm , u:hastype x T[]]</code>. We also know that the second input, called
+				<code>f</code>, to the function unique has type <code>[g |- hastype #p.1 T'[]]</code>. By
+				inversion on <code>f</code>, we know that the only possible object that can inhabit this
+				type is <code>[g |- #p.2]</code> and therefore <code>T'</code> must be identical to
+				<code>T</code>. Moreover, <code>#r</code> denotes the same block as <code>#p</code>.
+			</p>
+		</li>
+	</ul>
+</div>
+<!-- HTML_TAG_END --> <a class="btn btn-lg btn-primary mb-4" href="https://github.com/Beluga-lang/Beluga/blob/master/examples/literate_beluga/0Beginner/Type_Uniqueness.bel" data-svelte-h="svelte-1i8g73s">Download the code</a> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 8],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

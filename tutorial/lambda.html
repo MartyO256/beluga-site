@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/18.OoEczQ3S.js"><title>lambda Example</title><!-- HEAD_svelte-9t1rlx_START --><!-- HEAD_svelte-9t1rlx_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <!-- HTML_TAG_START --><pre><code><span id="lf-type-tp" class="constant lf-type-constant">tp</span> : <span class="keyword keyword-type">type</span>.
+<span id="lf-type-tm" class="constant lf-type-constant">tm</span> : <span class="keyword keyword-type">type</span>.</code></pre>
+
+<div class="documentation"><p>Types</p></div>
+
+<pre><code><span id="lf-term-arr" class="constant lf-term-constant">arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>.</code></pre>
+
+<div class="documentation"><p>Terms</p></div>
+
+<pre><code><span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>.
+<span id="lf-term-lam" class="constant lf-term-constant">lam</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → (<span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>.</code></pre>
+
+<div class="documentation"><p>Values</p></div>
+
+<pre><code><span id="lf-type-value" class="constant lf-type-constant">value</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="keyword keyword-type">type</span>.
+<span id="lf-type-step" class="constant lf-type-constant">step</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="keyword keyword-type">type</span>.
+<span id="lf-term-s_app1" class="constant lf-term-constant">s_app1</span> : <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable lf-variable">E1</span> <span class="variable lf-variable">E1'</span> → <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">E1</span> <span class="variable lf-variable">E2</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">E1'</span> <span class="variable lf-variable">E2</span>).
+<span id="lf-term-s_app2" class="constant lf-term-constant">s_app2</span> : <span class="constant lf-type-constant"><a href="#lf-type-value">value</a></span> <span class="variable lf-variable">E1</span> → <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable lf-variable">E2</span> <span class="variable lf-variable">E2'</span> → <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">E1</span> <span class="variable lf-variable">E2</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">E1</span> <span class="variable lf-variable">E2'</span>).
+<span id="lf-term-s_app3" class="constant lf-term-constant">s_app3</span> : <span class="constant lf-type-constant"><a href="#lf-type-value">value</a></span> <span class="variable lf-variable">E2</span> → <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">T</span> (\x. <span class="variable lf-variable">E1</span> <span class="variable lf-variable">x</span>)) <span class="variable lf-variable">E2</span>) (<span class="variable lf-variable">E1</span> <span class="variable lf-variable">E2</span>).</code></pre>
+
+<div class="documentation"><p>Typing</p></div>
+
+<pre><code><span id="lf-type-has_type" class="constant lf-type-constant">has_type</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span>.
+<span id="lf-term-is_app" class="constant lf-term-constant">is_app</span> : <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> <span class="variable lf-variable">E1</span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span>) → <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> <span class="variable lf-variable">E2</span> <span class="variable lf-variable">T1</span> → <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">E1</span> <span class="variable lf-variable">E2</span>) <span class="variable lf-variable">T2</span>.
+<span id="lf-term-is_lam" class="constant lf-term-constant">is_lam</span> :
+  ({x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">T1</span> → <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> (<span class="variable lf-variable">E</span> <span class="variable lf-variable">x</span>) <span class="variable lf-variable">T2</span>) →
+    <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">T1</span> (\x. <span class="variable lf-variable">E</span> <span class="variable lf-variable">x</span>)) (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span>).</code></pre>
+
+<div class="documentation"><p>Preservation</p></div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-pres" class="constant computation-program">pres</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> <span class="variable meta-variable">E</span> <span class="variable meta-variable">T</span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-step">step</a></span> <span class="variable meta-variable">E</span> <span class="variable meta-variable">E'</span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-has_type">has_type</a></span> <span class="variable meta-variable">E'</span> <span class="variable meta-variable">T</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">d</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">s</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">s</span> <span class="keyword keyword-of">of</span>
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-s_app1">s_app1</a></span> <span class="variable meta-variable">S1</span>] ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-is_app">is_app</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [ ⊢ <span class="variable meta-variable">D1'</span>] = <span class="constant computation-program"><a href="#theorem-pres">pres</a></span> [ ⊢ <span class="variable meta-variable">D1</span>] [ ⊢ <span class="variable meta-variable">S1</span>] <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-is_app">is_app</a></span> <span class="variable meta-variable">D1'</span> <span class="variable meta-variable">D2</span>]
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-s_app2">s_app2</a></span> <span class="variable meta-variable">V</span> <span class="variable meta-variable">S2</span>] ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-is_app">is_app</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [ ⊢ <span class="variable meta-variable">D2'</span>] = <span class="constant computation-program"><a href="#theorem-pres">pres</a></span> [ ⊢ <span class="variable meta-variable">D2</span>] [ ⊢ <span class="variable meta-variable">S2</span>] <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-is_app">is_app</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2'</span>]
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-s_app3">s_app3</a></span> <span class="variable meta-variable">V</span>] ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-is_app">is_app</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-is_lam">is_lam</a></span> (\x. \d. <span class="variable meta-variable">D1</span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">d</span>)) <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    [ ⊢ <span class="variable meta-variable">D1</span> _ <span class="variable meta-variable">D2</span>];</code></pre>
+<!-- HTML_TAG_END --> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 18],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

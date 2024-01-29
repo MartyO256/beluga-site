@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/3.TpmerKuT.js"><title>Beluga Case Studies</title><!-- HEAD_svelte-ar64mp_START --><!-- HEAD_svelte-ar64mp_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link active" aria-current="page" href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <h2 id="0Beginner" data-svelte-h="svelte-1y68t2i">Beginner</h2> <h4 data-svelte-h="svelte-1oumpov"><a href="https://complogic.cs.mcgill.ca/tutorial.pdf">Beginner&#39;s Guide to Programming in Beluga</a></h4> <p data-svelte-h="svelte-k2tfcv">This guide is mostly for users who have only a background in functional programming as often
+	taught in an undergraduate class. We show how to write some common simple functional programs in
+	Beluga and also briefly discuss how to write simple proofs in Beluga.Here are a few sample
+	programs discussed in the tutorial to get you started</p> <ul data-svelte-h="svelte-188jhut"><li><a href="tutorial/nat">nat.bel:</a> naturals (Section 2);</li> <li><a href="tutorial/yn">yn.bel</a> yes and no (Section 2);</li> <li><a href="tutorial/listnat">listnat.bel:</a> Lists of naturals (Section 2);</li> <li><a href="tutorial/dtlist">dtlist.bel:</a> length indexed lists (Section 3);</li> <li><a href="tutorial/typesterms2">typesterms2.bel:</a> list filtering (Section 3);</li> <li><a href="tutorial/typesterms3">typesterms3.bel:</a> list filtering (Section 3);</li> <li><a href="tutorial/typesterms">typesterms.bel:</a> evaluation is deterministic (Section 4);</li> <li><a href="tutorial/lambda">lambda.bel:</a> lambda-calculus and proof of preservation (Section 5).</li></ul> <h4 data-svelte-h="svelte-1piou6n"><a href="examples/literate_beluga/0Beginner/Close_Terms">Close Terms</a></h4> <p data-svelte-h="svelte-1cyapkf">We build a simple program that closes open terms, converting each free variable to one bound by a
+	lambda abstraction. The example demonstrates pattern matching on contexts and Beluga&#39;s built-in
+	mechanism for variable substitution.</p>   <h4 data-svelte-h="svelte-187vdxw"><a href="examples/literate_beluga/0Beginner/Type_Uniqueness">Type Uniqueness</a></h4> <p data-svelte-h="svelte-10ioqv6">Since Beluga does not support equality types, we implement equality using an LF type family as a
+	dependent kind. The difficulties of defining equality via reflexivity in Twelf do not arise in
+	Beluga. Beluga&#39;s proof is implemented as a function using pattern matching instead of relations;
+	as we pattern match we learn more about the given derivations and information flows as expected.</p>   <h2 id="1Intermediate" data-svelte-h="svelte-f648an">Intermediate</h2> <h4 data-svelte-h="svelte-18c0nps"><a href="examples/literate_beluga/1Intermediate/Parallel_Reduction">Parallel Reduction</a></h4> <p data-svelte-h="svelte-jiaqr3">The order of assumptions in a context is important in Beluga. However, sometimes the need to
+	reorder assumptions arises, as is illustrated in the proof of the substitution lemma for
+	algorithmic equality. As in Twelf this kind of proof does not come for free in Beluga.</p> <h4 data-svelte-h="svelte-14e87ts"><a href="examples/literate_beluga/1Intermediate/Polymorphic_Algorithmic_Equality">Polymorphic Algorithmic Equality</a></h4> <p data-svelte-h="svelte-e8l0oh">In order to prove algorithmic equality for a polymorphic lambda-calculus, we establish schemas
+	with alternating assumptions, depending on the type of the variable.</p> <h4 data-svelte-h="svelte-1s2lff4"><a href="examples/literate_beluga/1Intermediate/Poplmark">Poplmark</a></h4> <p data-svelte-h="svelte-1yu6731">This example shows a solution of the <a href="http://www.seas.upenn.edu/~plclub/poplmark/">POPLMARK Challenge</a> Part 1A, Transitivity of Subtyping.</p> <h4 data-svelte-h="svelte-tz13hp"><a href="examples/literate_beluga/1Intermediate/Untyped_Algorithmic_Equality_-_Context_Relation">Untyped Algorithmic Equality - Context Relation</a></h4> <p data-svelte-h="svelte-1xxaq5z">Context relationships can be defined explicitly using inductive datatypes. In this proof we use
+	inductive datatypes to establish strengthening and weakening between contexts.</p> <h4 data-svelte-h="svelte-1mu6cmf"><a href="examples/literate_beluga/1Intermediate/Untyped_Algorithmic_Equality_-_Context_Subsumption">Untyped Algorithmic Equality - Context Subsumption</a></h4> <p data-svelte-h="svelte-1xkig5m">This example demonstrates Beluga&#39;s capacity for automatic context subsumption. If schema W is a
+	prefix of a schema W0, then we can always use a context of schema W0 in place of a context of
+	schema W. Essentially, we allow the user to pass a context of schema W0 where a context with
+	schema W if W0 contains at least as much information as W.</p> <h2 id="2Advanced" data-svelte-h="svelte-y5a6e0">Advanced</h2> <h4 data-svelte-h="svelte-15almxy"><a href="examples/literate_beluga/2Advanced/Normalization_by_Evaluation">Normalization by Evaluation</a></h4> <p data-svelte-h="svelte-bnzop6">A normalization by evaluation algorithm for an intrinsically typed simply-typed lambda calculus.</p> <h4 data-svelte-h="svelte-hvzlry"><a href="examples/literate_beluga/2Advanced/Weak_Normalization">Weak Normalization</a></h4> <p data-svelte-h="svelte-1wx6vwh">A proof of weak head normalization for the simply typed lambda calculus using logical relations.</p> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 3],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

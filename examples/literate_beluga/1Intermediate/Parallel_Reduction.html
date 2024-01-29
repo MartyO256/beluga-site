@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/9.W7ay6Wjp.js"><title>Type Preservation for Parallel Reduction for the Simply-typed Lambda-calculus</title><!-- HEAD_svelte-16bbygm_START --><!-- HEAD_svelte-16bbygm_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <!-- HTML_TAG_START --><div class="documentation">
+	<h1 id="Type-Preservation-for-Parallel-Reduction-for-the-Simply-typed-Lambda-calculus">
+		Type Preservation for Parallel Reduction for the Simply-typed Lambda-calculus
+	</h1>
+
+	<p>
+		We discuss the notion of parallel reduction, a standard relation relevant to many other
+		important case studies, like the Church-Rosser Theorem. This case study is part of
+		<a ref="https://github.com/pientka/ORBI">ORBI</a>, the Open challenge problem Repository for
+		systems reasoning with Binders. For a detailed description of the proof and a discussion
+		regarding other systems see
+		<a target="_blank" href="/beluga-site/orbi-jar.pdf">(Felty et al, 2014)</a>.
+	</p>
+	<p>The mechanization highlights several aspects:</p>
+	<ul>
+		<li>Context exchange via substitution</li>
+		<li>Free substitution property for parametric and hypothetical derivations</li>
+		<li>Type reconstruction via inference</li>
+	</ul>
+
+	<h2 id="Syntax">Syntax</h2>
+
+	<p>We encode the simply-typed lambda-calculus in the logical framework LF.</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-tp" class="constant lf-type-constant">tp</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-arr" class="constant lf-term-constant">arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>
+| <span id="lf-term-nat" class="constant lf-term-constant">nat</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-tp">tp</a></span> T.</span>
+
+<span class="keyword keyword-LF">LF</span> <span id="lf-type-tm" class="constant lf-type-constant">tm</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>
+| <span id="lf-term-lam" class="constant lf-term-constant">lam</span> : (<span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-tm">tm</a></span> M x.</span></code></pre>
+
+<div class="documentation">
+	<h2 id="Judgements-and-Rules">Judgements and Rules</h2>
+
+	<p>
+		We describe parallel reduction and typing judgement for the simply-typed lambda-calculus using
+		axioms and inference rules. The Beluga code is a straightforward HOAS encoding of the associated
+		rules.
+	</p>
+	<h3 id="Parallel-reduction">Parallel reduction</h3>
+
+	<p>
+		The predicate <code>pr</code> of type <code>tm -&gt; tm -&gt; type</code> defines parallel
+		reduction, that M may reduce to M' or <code>M -&gt; M'</code>. β-reduction <code>pr_b</code> and
+		its congruence rules <code>pr_l</code> and <code>pr_a</code> comprise the set of inference
+		rules.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-pr" class="constant lf-type-constant">pr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-pr_l" class="constant lf-term-constant">pr_l</span> : ({x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span> → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) (<span class="variable lf-variable">N</span> <span class="variable lf-variable">x</span>)) → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">M</span>) (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">N</span>)
+| <span id="lf-term-pr_b" class="constant lf-term-constant">pr_b</span> :
+  ({x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span> → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) (<span class="variable lf-variable">M'</span> <span class="variable lf-variable">x</span>)) → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">N</span> <span class="variable lf-variable">N'</span> → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">M</span>) <span class="variable lf-variable">N</span>) (<span class="variable lf-variable">M'</span> <span class="variable lf-variable">N'</span>)
+| <span id="lf-term-pr_a" class="constant lf-term-constant">pr_a</span> : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M'</span> → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">N</span> <span class="variable lf-variable">N'</span> → <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M'</span> <span class="variable lf-variable">N'</span>);</code></pre>
+
+<div class="documentation">
+	<h3 id="Typing-judgement">Typing judgement</h3>
+	<p>
+		Following the judgements-as-types principle, we define the type family
+		<code>oft</code> which is indexed by terms <code>tm</code> and types <code>tp</code>.
+		Constructors <code>of_app</code> and <code>of_lam</code> encode the typing rules for application
+		and abstraction, respectively.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-oft" class="constant lf-type-constant">oft</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-of_app" class="constant lf-term-constant">of_app</span> : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">M1</span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T2</span> <span class="variable lf-variable">T</span>) → <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">M2</span> <span class="variable lf-variable">T2</span> → <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">M2</span>) <span class="variable lf-variable">T</span>
+| <span id="lf-term-of_lam" class="constant lf-term-constant">of_lam</span> : ({x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">T1</span> → <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) <span class="variable lf-variable">T2</span>) → <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> <span class="variable lf-variable">M</span>) (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span>);
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-oft">oft</a></span> H.</span></code></pre>
+
+<div class="documentation">
+	<h2 id="Context-declarations">Context declarations</h2>
+	<p>Just as types classify expressions, contexts are classified by context schemas.</p>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-rCtx" class="constant context-schema">rCtx</span> = <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, <span class="variable lf-variable">pr_v</span> : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>);
+
+<span class="keyword keyword-schema">schema</span> <span id="schema-tCtx" class="constant context-schema">tCtx</span> = <span class="keyword keyword-some">some</span> [<span class="variable lf-variable">t</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>] <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, <span class="variable lf-variable">of_v</span> : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">t</span>);
+
+<span class="keyword keyword-schema">schema</span> <span id="schema-trCtx" class="constant context-schema">trCtx</span> = <span class="keyword keyword-some">some</span> [<span class="variable lf-variable">t</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>] <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, <span class="variable lf-variable">of_v</span> : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">t</span>, <span class="variable lf-variable">pr_v</span> : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>);</code></pre>
+
+<div class="documentation">
+	<h2 id="Substitution-Lemma">Substitution Lemma</h2>
+	<p>
+		Beluga enjoys the usual substitution property for parametric and hypothetical derivations for
+		free since substitutivity is just a by-product of hypothetical-parametric judgements. Strictly
+		speaking, the substitution lemma does not need to be stated explicitly in order to prove type
+		preservation for parallel reduction but we've encoded it regardless. While this is usually
+		proved by induction on the first derivation, we show it as a corollary of the substitution
+		principles. In stating the substitution lemma we explicitly state that the types
+		<code>S</code> and <code>T</code> cannot depend on the context <code>g</code>, i.e. they are
+		closed.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-subst" class="constant computation-program">subst</span> :
+  (<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-tCtx">tCtx</a></span>)
+    (<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable meta-variable">T</span>[]) ⊢ <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable meta-variable">M</span>[…, <span class="variable lf-variable">b</span>.1] <span class="variable meta-variable">S</span>[]) →
+      (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable meta-variable">N</span> <span class="variable meta-variable">T</span>[]) → (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable meta-variable">M</span>[…, <span class="variable meta-variable">N</span>] <span class="variable meta-variable">S</span>[]) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">d1</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">d2</span> ⇒
+  <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable meta-variable">T</span>) ⊢ <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] = <span class="variable computation-variable">d1</span> <span class="keyword keyword-in">in</span>
+  <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d2</span> <span class="keyword keyword-in">in</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D1</span>[…, _, <span class="variable meta-variable">D2</span>]];</code></pre>
+
+<div class="documentation">
+	<h2 id="Type-Preservation-for-Parallel-Reductions">Type Preservation for Parallel Reductions</h2>
+	<p>
+		We prove type preservation for parallel reduction: when <code>M</code> steps to
+		<code>N</code> and <code>M</code> has type <code>A</code> then <code>N</code> has the same type
+		<code>A</code>. expressions to depend on the context since we may step terms containing
+		variables. Substitution property for parametric and hypothetical derivations is free. We do not
+		enforce here that the type <code>A</code> is closed. Although this is possible by writing
+		<code>A[]</code> the statement looks simpler if we do not enforce this extra invariant.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-tps" class="constant computation-program">tps</span> : (<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-trCtx">trCtx</a></span>) (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">N</span>) → (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">A</span>) → (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable meta-variable">N</span> <span class="variable meta-variable">A</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">r</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">d</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">r</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">g</span> ⊢ <span class="variable parameter-variable">#p</span>.3] ⇒ <span class="variable computation-variable">d</span>
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-pr_b">pr_b</a></span> (\x. \pr_v. <span class="variable meta-variable">R1</span>) <span class="variable meta-variable">R2</span>] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-of_app">of_app</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-of_lam">of_lam</a></span> (\x. \of_v. <span class="variable meta-variable">D1</span>)) <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span>
+      [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable meta-variable">T</span>, pr_v : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢
+        <span class="variable meta-variable">F1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-tps">tps</a></span>
+        [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> _, pr_v : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢
+          <span class="variable meta-variable">R1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.3]] [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">F2</span>] = <span class="constant computation-program"><a href="#theorem-tps">tps</a></span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">R2</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">F1</span>[…, _, <span class="variable meta-variable">F2</span>]]
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-pr_l">pr_l</a></span> (\x. \pr_v. <span class="variable meta-variable">R</span>)] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-of_lam">of_lam</a></span> (\x. \of_v. <span class="variable meta-variable">D</span>)] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span>
+      [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> <span class="variable meta-variable">T</span>, pr_v : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-tps">tps</a></span>
+        [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>, of_v : <span class="constant lf-type-constant"><a href="#lf-type-oft">oft</a></span> <span class="variable lf-variable">x</span> _, pr_v : <span class="constant lf-type-constant"><a href="#lf-type-pr">pr</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢
+          <span class="variable meta-variable">R</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.3]] [<span class="variable context-variable">g</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-of_lam">of_lam</a></span> (\x. \of_v. <span class="variable meta-variable">F</span>)]
+  | [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-pr_a">pr_a</a></span> <span class="variable meta-variable">R1</span> <span class="variable meta-variable">R2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-of_app">of_app</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] = <span class="variable computation-variable">d</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">F1</span>] = <span class="constant computation-program"><a href="#theorem-tps">tps</a></span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">R1</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">F2</span>] = <span class="constant computation-program"><a href="#theorem-tps">tps</a></span> [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">R2</span>] [<span class="variable context-variable">g</span> ⊢ <span class="variable meta-variable">D2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-of_app">of_app</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>];</code></pre>
+
+<div class="documentation">
+	<p>
+		The β-reduction case is perhaps the most note-worthy. We know by assumption that
+		<code>d:[g |- oft (app (lam A (\x. M x)) N) (arr A B)]</code> and by inversion that
+		<code>d:[g |- of_a (of_l \x. \u. D1 x u)D2]</code> where <code>D1</code> stands for
+		<code>oft (M x) B</code> in the extended context <code>g, x:tm , u:oft x A</code>. Furthermore,
+		<code>D2</code> describes a derivation <code>oft N A</code>. A recursive call on
+		<code>D2</code> yields <code>F2:oft N' A</code>. Likewise, by the i.h. on <code>D1</code>, we
+		obtain a derivation <code>F1:oft M' B</code> in <code>g, b:block (x:tm , of_x:oft x A)</code>.
+		We now want to substitute for <code>x</code> the term <code>N'</code>, and for the derivation
+		<code>oft x A</code> the derivation <code>F2</code>. This is achieved by applying to
+		<code>F1</code> the substitution <code>[.., _ F2]</code>. Since in the program above we do not
+		have the name <code>N</code> available, we write an underscore and let Beluga's type
+		reconstruction algorithm infer the appropriate name.
+	</p>
+</div>
+<!-- HTML_TAG_END --> <a class="btn btn-lg btn-primary mb-4" href="https://github.com/Beluga-lang/Beluga/blob/master/examples/literate_beluga/0Beginner/Parallel_Reduction.bel" data-svelte-h="svelte-pze60w">Download the code</a> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 9],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

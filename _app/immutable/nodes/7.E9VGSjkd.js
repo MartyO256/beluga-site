@@ -1,0 +1,135 @@
+import{s as f,n as r}from"../chunks/scheduler.BRW4IjsR.js";import{S as v,i as b,s as i,H as u,e as y,k as w,d as l,f as m,o as g,c as x,l as k,m as h,g as c}from"../chunks/index.yRNBcVz4.js";const T=`<pre><code><span class="pragma pragma-coverage">--coverage</span></code></pre>
+
+<div class="documentation">
+	<h1 id="Closing-terms-with-free-variables">Closing terms with free variables</h1>
+
+	<p>We'll first define what terms are in the untyped lambda calculus.</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-tm" class="constant lf-type-constant">tm</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-lam" class="constant lf-term-constant">lam</span> : (<span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>
+| <span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>;</code></pre>
+
+<div class="documentation">
+	<p>
+		Recall that Beluga has two levels of language: the index level (for representing data) and the
+		computation-level. Note that type name and constructors for an index-level type are lower case.
+	</p>
+	<h2 id="Open-terms-in-Beluga">Open terms in Beluga</h2>
+
+	<p>
+		One thing that's unique about Beluga is that we can easily represent open terms, that is, terms
+		with free variables. For example, the term
+		<code>x + 1</code> is open because it contains the free variable <code>x</code>. In Beluga, we
+		can represent such terms if we declare the free variable to be part of a &quot;context&quot;. So
+		a term in Beluga has a context as part of its type, which we shall see in the example.
+	</p>
+	<p>
+		Something we might want to do is interpret the free variable in an open term as the argument of
+		a lambda term. That is, we might want to convert
+		<code>x + 1</code> to a lambda term <code>lam (\\x -&gt; x + 1)</code>. This second term will no
+		longer need <code>x</code> in its context, as the variable is now bound to the lambda. If we
+		have a term with multiple free variables, we can apply this process repeatedly to turn them all
+		into bound variables. The aim of this example is to write a function to do this in Beluga.
+	</p>
+	<h2 id="Simple-case-removing-one-free-variable">Simple case: removing one free variable</h2>
+
+	<p>
+		Let's start by closing a term with just one free variable. Observe that the free variables in
+		the argument and return value are expressed in the type signature. The parameter type is a term
+		with one variable in its context, whereas the return type has an empty context (so return values
+		of this function must be closed if they are to be well-typed).
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-close-only1" class="constant computation-program">close-only1</span> : (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">t</span> ⇒ <span class="keyword keyword-let">let</span> [<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="variable meta-variable">T</span>] = <span class="variable computation-variable">t</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\\u. <span class="variable meta-variable">T</span>)];</code></pre>
+
+<div class="documentation">
+	<p>
+		The idea of the function body is simply to make the term's free variable a lambda variable. We
+		name the free variable <code>x</code> and replace it with the lambda variable <code>u</code>.
+		Notice how we do this by writing <code>T</code> like a function of <code>x</code>. Also note how
+		the term is named with an upper case letter, which is required to distinguish index-level terms.
+	</p>
+	<h2 id="Removing-one-free-variable-out-of-many">Removing one free variable (out of many)</h2>
+
+	<p>
+		We now want to write a function that closes more general terms, i.e. terms with more free
+		variables. In order for such terms to be well-typed, however, their free variables must be
+		mentioned in their contexts. Hence we specify that our contexts are lists of terms, using the
+		<code>schema</code> keyword.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-ctx" class="constant context-schema">ctx</span> = <span class="keyword keyword-block">block</span> <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>;</code></pre>
+
+<div class="documentation">
+	<p>
+		Now we can try to replace just the last free variable in the context list with a lambda
+		abstraction. Notice the new context parameter in braces, which we use as part of the context of
+		the input term. (The parameter type is &quot;dependent&quot; on <code>g</code>.) We distinguish
+		one variable <code>x</code> from the input context, and remove it from the output context.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-close1" class="constant computation-program">close1</span> : {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>} (<span class="variable context-variable">g</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">g</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">t</span> ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">g</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="variable meta-variable">T</span>] = <span class="variable computation-variable">t</span> <span class="keyword keyword-in">in</span> [<span class="variable context-variable">g</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\\u. <span class="variable meta-variable">T</span>)];</code></pre>
+
+<div class="documentation">
+	<p>
+		In this function we must use &quot;mlam&quot;, which is the equivalent of &quot;fn&quot; for
+		context parameters. Notice that the function body is very similar to that of
+		<code>close-only1</code>. The only difference is that <code>T</code> may now depend on other
+		variables in its context besides <code>x</code>. But since we are only replacing the
+		<code>x</code> variable, we need a way to say to skip over the other variables. The
+		<code>..</code> symbol represents the free variables in <code>g</code> without naming them.
+	</p>
+	<h2 id="General-case-removing-all-free-variables">General case: removing all free variables</h2>
+
+	<p>
+		The idea here is to use <code>close1</code> repeatedly to replace all free variables with lambda
+		abstractions. Notice the new type signature, where the parameter type has a general context
+		(with any number of free variables) and the return type has the empty context, implying that the
+		output term is closed.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-close" class="constant computation-program">close</span> : {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>} (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">g</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">t</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">t</span> <span class="keyword keyword-of">of</span>
+  | [ ⊢ _] ⇒ <span class="variable computation-variable">t</span>
+  | [<span class="variable context-variable">g'</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="variable meta-variable">T</span>] ⇒ <span class="constant computation-program"><a href="#theorem-close">close</a></span> [<span class="variable context-variable">g'</span>] (<span class="constant computation-program"><a href="#theorem-close1">close1</a></span> [<span class="variable context-variable">g'</span>] <span class="variable computation-variable">t</span>);</code></pre>
+
+<div class="documentation">
+	<p>
+		The function is recursive on the input's context list (not the actual term!). The base case is
+		when the context is empty. This means that the term is already closed, so we simply return it.
+		We need not even name the unboxed term.
+	</p>
+	<p>
+		The recursive case produces the scenario we had in <code>close1</code>: a nonempty context with
+		at least one free variable <code>x</code>. In this case we apply <code>close1</code> to remove
+		<code>x</code> from the term and then recursively call <code>close</code> with a smaller
+		context.
+	</p>
+	<p>
+		We can also write the <code>close1</code> function inline to produce a more concise solution.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-close'" class="constant computation-program">close'</span> : {<span class="variable meta-variable">g</span> : <span class="constant context-schema"><a href="#schema-ctx">ctx</a></span>} (<span class="variable context-variable">g</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">g</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">t</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">t</span> <span class="keyword keyword-of">of</span>
+  | [ ⊢ _] ⇒ <span class="variable computation-variable">t</span>
+  | [<span class="variable context-variable">g'</span>, <span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-tm">tm</a></span> ⊢ <span class="variable meta-variable">T</span>] ⇒ <span class="constant computation-program"><a href="#theorem-close'">close'</a></span> [<span class="variable context-variable">g'</span>] [<span class="variable context-variable">g'</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\\u. <span class="variable meta-variable">T</span>)];</code></pre>
+
+<div class="documentation">
+	<p>
+		Notice how Beluga allows us to perform pattern matching on both the context and the actual term
+		in a boxed expression. Also notice how we have the ability to substitute variables built in to
+		the language. The use of &quot;higher order abstract syntax&quot; lets us avoid name clashing
+		issues when we substitute variables.
+	</p>
+</div>
+`;function _(d){let t,n,s,e,p="Download the code";return{c(){t=i(),n=new u(!1),s=i(),e=y("a"),e.textContent=p,this.h()},l(a){w("svelte-1jifvhx",document.head).forEach(l),t=m(a),n=g(a,!1),s=m(a),e=x(a,"A",{class:!0,href:!0,"data-svelte-h":!0}),k(e)!=="svelte-a8uhv"&&(e.textContent=p),this.h()},h(){document.title="Closing terms with free variables",n.a=s,h(e,"class","btn btn-lg btn-primary mb-4"),h(e,"href","https://github.com/Beluga-lang/Beluga/blob/master/examples/literate_beluga/0Beginner/Close_Terms.bel")},m(a,o){c(a,t,o),n.m(T,a,o),c(a,s,o),c(a,e,o)},p:r,i:r,o:r,d(a){a&&(l(t),n.d(),l(s),l(e))}}}class C extends v{constructor(t){super(),b(this,t,null,_,f,{})}}export{C as component};

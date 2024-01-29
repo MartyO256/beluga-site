@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/10.m13KCsxp.js"><title>Algorithmic Equality for the Polymorphic Lambda-calculus (G-version)</title><!-- HEAD_svelte-wihrba_START --><!-- HEAD_svelte-wihrba_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <!-- HTML_TAG_START --><div class="documentation">
+	<h1 id="Algorithmic-Equality-for-the-Polymorphic-Lambda-calculus-G-version">
+		Algorithmic Equality for the Polymorphic Lambda-calculus (G-version)
+	</h1>
+
+	<p>
+		We discuss completeness of algorithmic equality for typed lambda-terms with respect to
+		declarative equality of lambda-terms. This case-study is part of
+		<a ref="https://github.com/pientka/ORBI">ORBI</a>, Open challenge problem Repository for systems
+		reasoning with Binders. For a detailed description of the proof and a discussion regarding other
+		systems see <a target="_blank" href="/beluga-site/orbi-jar.pdf">(Felty et al, 2014)</a>.
+	</p>
+	<p>The mechanization highlights several aspects:</p>
+	<ul>
+		<li>Context schemas with alternative assumptions</li>
+		<li>Induction on universally quantified objects</li>
+		<li>Stating and proving properties in a generalized context</li>
+		<li>Reasoning using context subsumption</li>
+	</ul>
+
+	<h2 id="Syntax">Syntax</h2>
+
+	<p>The polymorphic lambda-calculus is introduced with the following declarations:</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-tp" class="constant lf-type-constant">tp</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-arr" class="constant lf-term-constant">arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>
+| <span id="lf-term-all" class="constant lf-term-constant">all</span> : (<span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-tp">tp</a></span> T a.</span>
+
+<span class="keyword keyword-LF">LF</span> <span id="lf-type-term" class="constant lf-type-constant">term</span> : <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-app" class="constant lf-term-constant">app</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>
+| <span id="lf-term-lam" class="constant lf-term-constant">lam</span> : (<span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>
+| <span id="lf-term-tlam" class="constant lf-term-constant">tlam</span> : (<span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>) → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>
+| <span id="lf-term-tapp" class="constant lf-term-constant">tapp</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-term">term</a></span> M x.</span></code></pre>
+
+<div class="documentation">
+	<h2 id="Judgements-and-Rules">Judgements and Rules</h2>
+
+	<p>
+		We describe algorithmic and declarative equality for the polymorphic lambda-calculus as
+		judgements using axioms and inference rules. The Beluga code is a straightforward HOAS encoding
+		of the associated rules.
+	</p>
+
+	<h3 id="Algorithmic-Equality-for-types">Algorithmic Equality for types</h3>
+
+	<p>
+		We add the judgement for type equality <code>atp</code> of type
+		<code>tm -&gt; tm -&gt; type</code> along with inference rules for universal quantifiers
+		<code>at_al</code> and arrow types <code>at_arr</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-atp" class="constant lf-type-constant">atp</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-at_al" class="constant lf-term-constant">at_al</span> : ({a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span> → <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> (<span class="variable lf-variable">T</span> <span class="variable lf-variable">a</span>) (<span class="variable lf-variable">S</span> <span class="variable lf-variable">a</span>)) → <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-all">all</a></span> <span class="variable lf-variable">T</span>) (<span class="constant lf-term-constant"><a href="#lf-term-all">all</a></span> <span class="variable lf-variable">S</span>)
+| <span id="lf-term-at_arr" class="constant lf-term-constant">at_arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span> → <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">S1</span> <span class="variable lf-variable">S2</span> → <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">S1</span>) (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T2</span> <span class="variable lf-variable">S2</span>);
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-atp">atp</a></span> Q u.</span></code></pre>
+
+<div class="documentation">
+	<h3 id="Algorithmic-Equality-for-terms">Algorithmic Equality for terms</h3>
+
+	<p>
+		We extend the term equality judgement given for the untyped lambda-calculus with rules for type
+		abstraction <code>ae_tl</code> and type application <code>ae_ta</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-aeq" class="constant lf-type-constant">aeq</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-ae_a" class="constant lf-term-constant">ae_a</span> : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">N1</span> → <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">M2</span> <span class="variable lf-variable">N2</span> → <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">M2</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">N1</span> <span class="variable lf-variable">N2</span>)
+| <span id="lf-term-ae_l" class="constant lf-term-constant">ae_l</span> :
+  ({x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span> → <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) (<span class="variable lf-variable">N</span> <span class="variable lf-variable">x</span>)) →
+    <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>)) (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable lf-variable">N</span> <span class="variable lf-variable">x</span>))
+| <span id="lf-term-ae_tl" class="constant lf-term-constant">ae_tl</span> :
+  ({a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span> → <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">a</span>) (<span class="variable lf-variable">N</span> <span class="variable lf-variable">a</span>)) →
+    <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-tlam">tlam</a></span> (\a. <span class="variable lf-variable">M</span> <span class="variable lf-variable">a</span>)) (<span class="constant lf-term-constant"><a href="#lf-term-tlam">tlam</a></span> (\a. <span class="variable lf-variable">N</span> <span class="variable lf-variable">a</span>))
+| <span id="lf-term-ae_ta" class="constant lf-term-constant">ae_ta</span> : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span> → <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span> → <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-tapp">tapp</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">T</span>) (<span class="constant lf-term-constant"><a href="#lf-term-tapp">tapp</a></span> <span class="variable lf-variable">N</span> <span class="variable lf-variable">S</span>);
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-aeq">aeq</a></span> D u.</span></code></pre>
+
+<div class="documentation">
+	<p>
+		Note that type equality <code>atp A B</code> can be defined independently of term equality
+		<code>aeq M N</code>. In other words, <code>aeq M N</code> depends on <code>atp A B</code>, but
+		not vice-versa.
+	</p>
+
+	<h3 id="Declarative-Equality-for-types">Declarative Equality for types</h3>
+
+	<p>
+		We define declarative equality for types in order to establish its equivalence with algorithmic
+		equality and prove completeness. Rules for reflexivity, transitivity, and symmetry are
+		explicitly derived.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-dtp" class="constant lf-type-constant">dtp</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-dt_al" class="constant lf-term-constant">dt_al</span> : ({a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> (<span class="variable lf-variable">T</span> <span class="variable lf-variable">a</span>) (<span class="variable lf-variable">S</span> <span class="variable lf-variable">a</span>)) → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-all">all</a></span> <span class="variable lf-variable">T</span>) (<span class="constant lf-term-constant"><a href="#lf-term-all">all</a></span> <span class="variable lf-variable">S</span>)
+| <span id="lf-term-dt_arr" class="constant lf-term-constant">dt_arr</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">T2</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">S1</span> <span class="variable lf-variable">S2</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T1</span> <span class="variable lf-variable">S1</span>) (<span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable lf-variable">T2</span> <span class="variable lf-variable">S2</span>)
+| <span id="lf-term-dt_r" class="constant lf-term-constant">dt_r</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">T</span>
+| <span id="lf-term-dt_t" class="constant lf-term-constant">dt_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">R</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">R</span> <span class="variable lf-variable">S</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span>
+| <span id="lf-term-dt_s" class="constant lf-term-constant">dt_s</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">S</span> <span class="variable lf-variable">T</span>;
+
+<span class="pragma pragma-name">--name <span class="constant"><a href="#lf-type-atp">atp</a></span> P u.</span></code></pre>
+
+<div class="documentation">
+	<h3 id="Declarative-Equality-for-terms">Declarative Equality for terms</h3>
+
+	<p>
+		Declarative equality for terms is encoded similarly to its counterpart. Again, we are extending
+		the Untyped Equality case study to account for polymorphism with constructors for type
+		abstraction <code>de_tl</code> and type application <code>de_ta</code>
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-LF">LF</span> <span id="lf-type-deq" class="constant lf-type-constant">deq</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span> → <span class="keyword keyword-type">type</span> =
+| <span id="lf-term-de_l" class="constant lf-term-constant">de_l</span> :
+  ({x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>) (<span class="variable lf-variable">N</span> <span class="variable lf-variable">x</span>)) →
+    <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable lf-variable">M</span> <span class="variable lf-variable">x</span>)) (<span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable lf-variable">N</span> <span class="variable lf-variable">x</span>))
+| <span id="lf-term-de_a" class="constant lf-term-constant">de_a</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">N1</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M2</span> <span class="variable lf-variable">N2</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">M1</span> <span class="variable lf-variable">M2</span>) (<span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable lf-variable">N1</span> <span class="variable lf-variable">N2</span>)
+| <span id="lf-term-de_tl" class="constant lf-term-constant">de_tl</span> :
+  ({a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>} <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="variable lf-variable">M</span> <span class="variable lf-variable">a</span>) (<span class="variable lf-variable">N</span> <span class="variable lf-variable">a</span>)) →
+    <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-tlam">tlam</a></span> (\a. <span class="variable lf-variable">M</span> <span class="variable lf-variable">a</span>)) (<span class="constant lf-term-constant"><a href="#lf-term-tlam">tlam</a></span> (\a. <span class="variable lf-variable">N</span> <span class="variable lf-variable">a</span>))
+| <span id="lf-term-de_ta" class="constant lf-term-constant">de_ta</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span> → <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-tapp">tapp</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">T</span>) (<span class="constant lf-term-constant"><a href="#lf-term-tapp">tapp</a></span> <span class="variable lf-variable">N</span> <span class="variable lf-variable">S</span>)
+| <span id="lf-term-de_r" class="constant lf-term-constant">de_r</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">M</span>
+| <span id="lf-term-de_t" class="constant lf-term-constant">de_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">L</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">L</span> <span class="variable lf-variable">N</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">M</span> <span class="variable lf-variable">N</span>
+| <span id="lf-term-de_s" class="constant lf-term-constant">de_s</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">T</span> <span class="variable lf-variable">S</span> → <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">S</span> <span class="variable lf-variable">T</span>;</code></pre>
+
+<div class="documentation">
+	<h2 id="Context-declarations">Context declarations</h2>
+
+	<p>Just as types classify expressions, contexts are classified by context schemas.</p>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-atpCtx" class="constant context-schema">atpCtx</span> = <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">a</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>);</code></pre>
+
+<div class="documentation">
+	<p>
+		Since the case for lambda-abstraction <code>lam</code> deals with term assumptions while the
+		type abstraction <code>tlam</code> introduces type assumptions, we need to specify
+		<em>alternating</em> assumptions. This alternation of blocks is described by using
+		<code>+</code> in Beluga's concrete syntax.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-schema">schema</span> <span id="schema-aeqCtx" class="constant context-schema">aeqCtx</span> = <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, <span class="variable lf-variable">_u</span> : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>)
+  + <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">a</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>);
+
+<span class="keyword keyword-schema">schema</span> <span id="schema-dtpCtx" class="constant context-schema">dtpCtx</span> = <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">a</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, <span class="variable lf-variable">u</span> : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>);
+
+<span class="keyword keyword-schema">schema</span> <span id="schema-deqCtx" class="constant context-schema">deqCtx</span> = <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">x</span> : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, <span class="variable lf-variable">u</span> : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>)
+  + <span class="keyword keyword-block">block</span> (<span class="variable lf-variable">a</span> : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, <span class="variable lf-variable">u</span> : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, <span class="variable lf-variable">_t</span> : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>);</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Reflexivity-for-Types">Proof of Reflexivity for Types</h2>
+
+	<p>
+		The reflexivity for types is implemented as a recursive function called
+		<code>reftp</code> of type: <code>{Γ:atpCtx}{T:[Γ |- tp]}[Γ |- atp T T]</code>. This can be read
+		as: for all contexts <code>g</code> that have schema <code>atpCtx</code>, for all types
+		<code>T</code>, we have a proof that <code>[g |- atp T T]</code>. Quantification over contexts
+		and contextual objects in computation-level types is denoted between braces <code>{}</code>; the
+		corresponding abstraction on the level of expressions is written as
+		<code>mlam g =&gt; mlam T1 =&gt; e</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-reftp" class="constant computation-program">reftp</span> : {<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-atpCtx">atpCtx</a></span>} {<span class="variable meta-variable">T</span> : (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>)} (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">T</span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">Γ</span> ⇒ <span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">T</span> ⇒
+  <span class="keyword keyword-case">case</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">T</span>] <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.1] ⇒ [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-all">all</a></span> (\x. <span class="variable meta-variable">T</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-reftp">reftp</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>)] [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">T</span>[…, <span class="variable lf-variable">b</span>.1]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\x. \w. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-arr">arr</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-reftp">reftp</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">T</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-reftp">reftp</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">S</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>];</code></pre>
+
+<div class="documentation">
+	<p>
+		In the proof for <code>refltp</code> we begin by introducing and <code>T</code> followed by a
+		case analysis on <code>[Γ |- T]</code> using pattern matching. There are three possible cases
+		for <code>T</code>:
+	</p>
+	<ul>
+		<li>
+			<strong>Variable case.</strong> If <code>T</code> is a variable from <code>g</code>, we write
+			<code>[Γ |- #p.1]</code> where <code>#p</code> denotes a parameter variable declared in the
+			context <code>g</code>. Operationally, <code>#p</code> can be instantiated with any bound
+			variable from the context <code>g</code>. Since the context <code>g</code> has schema
+			<code>atpCtx</code>, it contains blocks <code>a:tp , _t:atp a a;</code>. The first projection
+			allows us to extract the type component, while the second projection denotes the proof of
+			<code>_t:atp a a;</code>.
+		</li>
+		<li>
+			<strong>Existential case.</strong> If <code>T</code> is an existential quantification, then we
+			extend the context and appeal to the induction hypothesis by making a recursive call. Beluga
+			supports declaration weakening which allows us to use <code>T</code> that has type
+			<code>[Γ, a:tp |- tp]</code> in the extended context
+			<code>[Γ, b:block a:tp , _t: atp a a]</code>. We simply construct a weakening substitution
+			<code>.. b.1</code> with domain <code>g, a:tp</code> and range
+			<code>g, b:block a:tp , _t: atp a a</code> that essentially renames <code>a</code> to
+			<code>b.1</code> in <code>T</code>. The recursive call returns
+			<code>[Γ, b:block a:tp , _t:atp a a |- D[.., b.1 , b.2]]</code>. Using it together with rule
+			<code>at_la</code> we build the final derivation.
+		</li>
+		<li>
+			<strong>Arrow case.</strong> If <code>T</code> is an arrow type, we appeal twice to the
+			induction hypothesis and build a proof for <code>[Γ |- atp (arr T S) (arr T S)]</code>.
+		</li>
+	</ul>
+
+	<h2 id="Proof-of-Reflexivity-for-Terms">Proof of Reflexivity for Terms</h2>
+
+	<p>
+		The recursive function <code>ref</code> encodes the proof reflexivity for terms. The type
+		signature reads: for all contexts <code>g</code> that have schema <code>aeqCtx</code>, for all
+		terms <code>M</code>, we have a proof that <code>[g |- aeq M M]</code>.
+	</p>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-ref" class="constant computation-program">ref</span> : {<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-aeqCtx">aeqCtx</a></span>} {<span class="variable meta-variable">M</span> : (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>)} (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">M</span>) =
+<span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">Γ</span> ⇒ <span class="keyword keyword-mlam">mlam</span> <span class="variable meta-variable">M</span> ⇒
+  <span class="keyword keyword-case">case</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">M</span>] <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.1] ⇒ [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-lam">lam</a></span> (\x. <span class="variable meta-variable">M</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (y : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">y</span> <span class="variable lf-variable">y</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (y : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">y</span> <span class="variable lf-variable">y</span>)] [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">M</span>[…, <span class="variable lf-variable">b</span>.1]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \w. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-app">app</a></span> <span class="variable meta-variable">M1</span> <span class="variable meta-variable">M2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">M1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">M2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-tlam">tlam</a></span> (\a. <span class="variable meta-variable">M</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>)] [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">M</span>[…, <span class="variable lf-variable">b</span>.1]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\x. \w. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-tapp">tapp</a></span> <span class="variable meta-variable">M</span> <span class="variable meta-variable">T</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">M</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-reftp">reftp</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">T</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>];</code></pre>
+
+<div class="documentation">
+	<p>
+		This time, there are five possible cases for our meta-variable
+		<code>M</code>:
+	</p>
+	<ul>
+		<li>
+			<strong>Variable case.</strong> If <code>M</code> is a variable from <code>g</code>, we write
+			<code>[Γ |- #p.1]</code> where <code>#p</code> denotes a parameter variable declared in the
+			context <code>g</code>. Operationally, <code>#p</code> can be instantiated with any bound
+			variable from the context <code>g</code>. Since the context <code>g</code> has schema
+			<code>aeqCtx</code>, it contains blocks <code>x:tm , ae_v:aeq x x.</code> The first projection
+			allows us to extract the term component, while the second projection denotes the proof of
+			<code>aeq x x</code>.
+		</li>
+		<li>
+			<strong>Lambda-abstraction case.</strong> If <code>M</code> is a lambda-term, then we extend
+			the context and appeal to the induction hypothesis by making a recursive call. Automatic
+			context subsumption comes into play again, allowing us to use M that has type
+			<code>[Γ, x:tm |- tm]</code> in the extended context
+			<code>[Γ, b:block y:tm , ae_v: aeq y y]</code>. We simply construct a weakening substitution
+			<code>.. b.1</code> with domain <code>g, y:tm</code> and range
+			<code>g, b:block y:tm , ae_v:aeq y y.</code> that essentially renames <code>y</code> to
+			<code>b.1</code> in <code>M</code>. The recursive call returns
+			<code>[Γ, b:block y:tm , ae_v:aeq y y |- D[.., b.1 b.2]]</code>. Using it together with rule
+			<code>ae_l</code> we build the final derivation.
+		</li>
+		<li>
+			<strong>Term application case.</strong> If <code>M</code> is an application, we appeal twice
+			to the induction hypothesis and build a proof for
+			<code>[Γ |- aeq (app M1 M2) (app M1 M2)]</code>.
+		</li>
+		<li>
+			<strong>Type abstraction case.</strong> If <code>M</code> is a type abstraction, then we
+			extend the context and appeal to the induction hypothesis by making a recursive call. We use
+			<code>M</code> that has type <code>[Γ, a:tp |- tp]</code> in the extended context
+			<code>[Γ, b:block a:tp , _t: atp a a]</code> and construct a weakening substitution
+			<code>.. b.1</code> with domain <code>g, a:tp</code> and range
+			<code>g, b:block a:tp , _t: atp a a</code> that essentially renames <code>a</code> to
+			<code>b.1</code> in <code>T</code>. The recursive call returns
+			<code>[Γ, b:block a:tp , _t:atp a a |- D[.., b.1, b.2]]</code>. Using it together with rule
+			<code>at_la</code> we build the final derivation.
+		</li>
+		<li>
+			<strong>Type application case.</strong> If <code>M</code> is a type application, we appeal
+			twice to the induction hypothesis and build a proof for
+			<code>[Γ |- aeqCtx (tapp M T) (tapp M T)]</code>.
+		</li>
+	</ul>
+
+	<h2 id="Proof-of-Transitivity-for-Types">Proof of Transitivity for Types</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-transtp" class="constant computation-program">transtp</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-atpCtx">atpCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">R</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">R</span> <span class="variable meta-variable">S</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae1</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae2</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">ae1</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2] ⇒ <span class="variable computation-variable">ae2</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\a. \u. <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\a. \u. <span class="variable meta-variable">D2</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-transtp">transtp</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]]
+        [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">D2</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\a. \u. <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D3</span> <span class="variable meta-variable">D4</span>] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] = <span class="constant computation-program"><a href="#theorem-transtp">transtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D3</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D'</span>] = <span class="constant computation-program"><a href="#theorem-transtp">transtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D4</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D</span> <span class="variable meta-variable">D'</span>];</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Transitivity-for-Terms">Proof of Transitivity for Terms</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-trans" class="constant computation-program">trans</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-aeqCtx">aeqCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">R</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">R</span> <span class="variable meta-variable">S</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae1</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae2</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">ae1</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2] ⇒ <span class="variable computation-variable">ae2</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \u. <span class="variable meta-variable">D1</span>)] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \u. <span class="variable meta-variable">D2</span>)] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x' : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x'</span> <span class="variable lf-variable">x'</span>) ⊢ <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]]
+        [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">D2</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \u. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D3</span> <span class="variable meta-variable">D4</span>] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] = <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D3</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D'</span>] = <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D4</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D</span> <span class="variable meta-variable">D'</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\a. \u. <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\a. \u. <span class="variable meta-variable">D2</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D1</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]]
+        [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> ⊢ <span class="variable meta-variable">D2</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\x. \u. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">Q1</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D2</span> <span class="variable meta-variable">Q2</span>] = <span class="variable computation-variable">ae2</span> <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] = <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q</span>] = <span class="constant computation-program"><a href="#theorem-transtp">transtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D</span> <span class="variable meta-variable">Q</span>];</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Symmetry-for-Types">Proof of Symmetry for Types</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-symtp" class="constant computation-program">symtp</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-atpCtx">atpCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">R</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">R</span> <span class="variable meta-variable">T</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">ae</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2] ⇒ <span class="variable computation-variable">ae</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\x. \u. <span class="variable meta-variable">D</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D'</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-symtp">symtp</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\x. \u. <span class="variable meta-variable">D'</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1'</span>] = <span class="constant computation-program"><a href="#theorem-symtp">symtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2'</span>] = <span class="constant computation-program"><a href="#theorem-symtp">symtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D1'</span> <span class="variable meta-variable">D2'</span>];</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Symmetry-for-Terms">Proof of Symmetry for Terms</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-sym" class="constant computation-program">sym</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-aeqCtx">aeqCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">R</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">R</span> <span class="variable meta-variable">T</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">ae</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">ae</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2] ⇒ <span class="variable computation-variable">ae</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \u. <span class="variable meta-variable">D</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">D'</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \u. <span class="variable meta-variable">D'</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1'</span>] = <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2'</span>] = <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D1'</span> <span class="variable meta-variable">D2'</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\x. \u. <span class="variable meta-variable">D</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D'</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] <span class="keyword keyword-in">in</span>
+    [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\x. \u. <span class="variable meta-variable">D'</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D</span> <span class="variable meta-variable">Q</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D'</span>] = <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q'</span>] = <span class="constant computation-program"><a href="#theorem-symtp">symtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D'</span> <span class="variable meta-variable">Q'</span>];</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Completeness-for-Types">Proof of Completeness for Types</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-ctp" class="constant computation-program">ctp</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-dtpCtx">dtpCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">e</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">e</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.3] ⇒ [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-dt_r">dt_r</a></span>] ⇒ <span class="constant computation-program"><a href="#theorem-reftp">reftp</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ _]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-dt_arr">dt_arr</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_arr">at_arr</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-dt_al">dt_al</a></span> (\x. \u. <span class="variable meta-variable">F</span>)] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.3]]
+    <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-at_al">at_al</a></span> (\x. \v. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-dt_t">dt_t</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F2</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span> <span class="constant computation-program"><a href="#theorem-transtp">transtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-dt_s">dt_s</a></span> <span class="variable meta-variable">F</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F</span>] <span class="keyword keyword-in">in</span> <span class="constant computation-program"><a href="#theorem-symtp">symtp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>];</code></pre>
+
+<div class="documentation">
+	<h2 id="Proof-of-Completeness-for-Terms">Proof of Completeness for Terms</h2>
+</div>
+
+<pre><code><span class="keyword keyword-rec">rec</span> <span id="theorem-ceq" class="constant computation-program">ceq</span> : (<span class="variable meta-variable">Γ</span> : <span class="constant context-schema"><a href="#schema-deqCtx">deqCtx</a></span>) (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) → (<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable meta-variable">T</span> <span class="variable meta-variable">S</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">e</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">e</span> <span class="keyword keyword-of">of</span>
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.3] ⇒ [<span class="variable context-variable">Γ</span> ⊢ <span class="variable parameter-variable">#p</span>.2]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_r">de_r</a></span>] ⇒ <span class="constant computation-program"><a href="#theorem-ref">ref</a></span> [<span class="variable context-variable">Γ</span>] [<span class="variable context-variable">Γ</span> ⊢ _]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_a">de_a</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F2</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_a">ae_a</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">D2</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_l">de_l</a></span> (\x. \u. <span class="variable meta-variable">F</span>)] ⇒
+    <span class="keyword keyword-let">let</span>
+      [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span>
+        [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (x : <span class="constant lf-type-constant"><a href="#lf-type-term">term</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-aeq">aeq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-deq">deq</a></span> <span class="variable lf-variable">x</span> <span class="variable lf-variable">x</span>) ⊢ <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.3]]
+    <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_l">ae_l</a></span> (\x. \v. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_t">de_t</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">F2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F2</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span> <span class="constant computation-program"><a href="#theorem-trans">trans</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D2</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_s">de_s</a></span> <span class="variable meta-variable">F</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F</span>] <span class="keyword keyword-in">in</span> <span class="constant computation-program"><a href="#theorem-sym">sym</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D</span>]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_tl">de_tl</a></span> (\a. \u. <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">a</span>, <span class="variable lf-variable">u</span>])] ⇒
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">D</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.2]] =
+      <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span>, <span class="variable lf-variable">b</span> : <span class="keyword keyword-block">block</span> (a : <span class="constant lf-type-constant"><a href="#lf-type-tp">tp</a></span>, u : <span class="constant lf-type-constant"><a href="#lf-type-atp">atp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>, _t : <span class="constant lf-type-constant"><a href="#lf-type-dtp">dtp</a></span> <span class="variable lf-variable">a</span> <span class="variable lf-variable">a</span>) ⊢ <span class="variable meta-variable">F</span>[…, <span class="variable lf-variable">b</span>.1, <span class="variable lf-variable">b</span>.3]]
+    <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_tl">ae_tl</a></span> (\x. \v. <span class="variable meta-variable">D</span>)]
+  | [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-de_ta">de_ta</a></span> <span class="variable meta-variable">F1</span> <span class="variable meta-variable">P2</span>] ⇒ <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">Q2</span>] = <span class="constant computation-program"><a href="#theorem-ctp">ctp</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">P2</span>] <span class="keyword keyword-in">in</span>
+    <span class="keyword keyword-let">let</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">D1</span>] = <span class="constant computation-program"><a href="#theorem-ceq">ceq</a></span> [<span class="variable context-variable">Γ</span> ⊢ <span class="variable meta-variable">F1</span>] <span class="keyword keyword-in">in</span> [<span class="variable context-variable">Γ</span> ⊢ <span class="constant lf-term-constant"><a href="#lf-term-ae_ta">ae_ta</a></span> <span class="variable meta-variable">D1</span> <span class="variable meta-variable">Q2</span>];</code></pre>
+<!-- HTML_TAG_END --> <a class="btn btn-lg btn-primary mb-4" href="https://github.com/Beluga-lang/Beluga/blob/master/examples/literate_beluga/0Beginner/Polymorphic_Algorithmic_Equality.bel" data-svelte-h="svelte-10pg4ra">Download the code</a> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 10],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

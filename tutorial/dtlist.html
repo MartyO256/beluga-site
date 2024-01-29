@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!--<link rel="icon" href="/beluga-site/favicon.png" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+		<link href="/beluga-site/_app/immutable/assets/0.ZN52t8Dy.css" rel="stylesheet">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/start.g-2aDSD5.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/entry.l65HBOEx.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/scheduler.BRW4IjsR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/paths.I5prkiXN.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/entry/app.4pCwBffu.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/index.yRNBcVz4.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/0.yLnkYr-I.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/each.6w4Ej4nR.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/chunks/stores.5r-2jwDb.js">
+		<link rel="modulepreload" href="/beluga-site/_app/immutable/nodes/17.40lUkKa2.js"><title>dtlist Example</title><!-- HEAD_svelte-ozfcsq_START --><!-- HEAD_svelte-ozfcsq_END -->
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">  <nav class="navbar navbar-expand-lg navbar-light bg-light"><div class="container"><a class="navbar-brand" href="/beluga-site/" data-svelte-h="svelte-jlhy6h">Beluga</a> <button class="navbar-toggler" type="button" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button> <div class="collapse navbar-collapse collapse" id="navbarSupportedContent"><ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item"><a class="nav-link " href="/beluga-site/">Home</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/#installation">Install</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/documentation">Documentation</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/casestudies">Case Studies</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/people">People</a> </li><li class="nav-item"><a class="nav-link " href="/beluga-site/downloads">Downloads</a> </li></ul></div></div></nav> <div class="container mt-4"> <!-- HTML_TAG_START --><pre><code><span id="lf-type-bool" class="constant lf-type-constant">bool</span> : <span class="keyword keyword-type">type</span>.
+<span id="lf-term-true" class="constant lf-term-constant">true</span> : <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span>.
+<span id="lf-term-false" class="constant lf-term-constant">false</span> : <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span>.
+
+<span id="lf-type-nat" class="constant lf-type-constant">nat</span> : <span class="keyword keyword-type">type</span>.
+<span id="lf-term-z" class="constant lf-term-constant">z</span> : <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>.
+<span id="lf-term-succ" class="constant lf-term-constant">succ</span> : <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span>.
+
+<span id="lf-type-list" class="constant lf-type-constant">list</span> : <span class="constant lf-type-constant"><a href="#lf-type-nat">nat</a></span> → <span class="keyword keyword-type">type</span>.
+<span id="lf-term-nil" class="constant lf-term-constant">nil</span> : <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> <span class="constant lf-term-constant"><a href="#lf-term-z">z</a></span>.
+<span id="lf-term-cons" class="constant lf-term-constant">cons</span> : <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span> → <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> <span class="variable lf-variable">N</span> → <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-succ">succ</a></span> <span class="variable lf-variable">N</span>).
+
+<span class="keyword keyword-let">let</span> <span id="val-l1" class="constant computation-program">l1</span> = [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="constant lf-term-constant"><a href="#lf-term-true">true</a></span> <span class="constant lf-term-constant"><a href="#lf-term-nil">nil</a></span>];
+
+<span class="keyword keyword-let">let</span> <span id="val-l2" class="constant computation-program">l2</span> = [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="constant lf-term-constant"><a href="#lf-term-true">true</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="constant lf-term-constant"><a href="#lf-term-false">false</a></span> <span class="constant lf-term-constant"><a href="#lf-term-nil">nil</a></span>)];
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-map" class="constant computation-program">map</span> : (( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span>)) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> <span class="variable meta-variable">N</span>) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> <span class="variable meta-variable">N</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">f</span> ⇒ <span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">l</span> ⇒
+  <span class="keyword keyword-case">case</span> <span class="variable computation-variable">l</span> <span class="keyword keyword-of">of</span>
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-nil">nil</a></span>] ⇒ [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-nil">nil</a></span>]
+  | [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="variable meta-variable">H</span> <span class="variable meta-variable">T</span>] ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="variable meta-variable">H'</span>] = <span class="variable computation-variable">f</span> [ ⊢ <span class="variable meta-variable">H</span>] <span class="keyword keyword-in">in</span> <span class="keyword keyword-let">let</span> [ ⊢ <span class="variable meta-variable">T'</span>] = <span class="constant computation-program"><a href="#theorem-map">map</a></span> <span class="variable computation-variable">f</span> [ ⊢ <span class="variable meta-variable">T</span>] <span class="keyword keyword-in">in</span>
+    [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="variable meta-variable">H'</span> <span class="variable meta-variable">T'</span>];
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-head" class="constant computation-program">head</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-succ">succ</a></span> <span class="variable meta-variable">N</span>)) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-bool">bool</a></span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">l</span> ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> <span class="variable meta-variable">H</span> _] = <span class="variable computation-variable">l</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="variable meta-variable">H</span>];
+
+<span class="keyword keyword-rec">rec</span> <span id="theorem-tail" class="constant computation-program">tail</span> : ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> (<span class="constant lf-term-constant"><a href="#lf-term-succ">succ</a></span> <span class="variable meta-variable">N</span>)) → ( ⊢ <span class="constant lf-type-constant"><a href="#lf-type-list">list</a></span> <span class="variable meta-variable">N</span>) =
+<span class="keyword keyword-fn">fn</span> <span class="variable computation-variable">l</span> ⇒ <span class="keyword keyword-let">let</span> [ ⊢ <span class="constant lf-term-constant"><a href="#lf-term-cons">cons</a></span> _ <span class="variable meta-variable">T</span>] = <span class="variable computation-variable">l</span> <span class="keyword keyword-in">in</span> [ ⊢ <span class="variable meta-variable">T</span>];</code></pre>
+<!-- HTML_TAG_END --> <p class="text-muted clearfix" data-svelte-h="svelte-4w36mg">© Computation and Logic Group <a href="http://www.cs.mcgill.ca/"><img alt="McGill University Logo" class="float-end" src="/beluga-site/_app/immutable/assets/mcgill-logo.JvN3dR6R.png"></a> <br>
+	Department of Computer Science, McGill University
+	<br>
+	3480 University Street, Montreal, Quebec, Canada, H3A 0E9</p></div> 
+			
+			<script>
+				{
+					__sveltekit_1i8eqz8 = {
+						base: "/beluga-site",
+						assets: "/beluga-site"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					const data = [null,null];
+
+					Promise.all([
+						import("/beluga-site/_app/immutable/entry/start.g-2aDSD5.js"),
+						import("/beluga-site/_app/immutable/entry/app.4pCwBffu.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 17],
+							data,
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
