@@ -1,10 +1,14 @@
 <script>
+	import KaTeX from '$lib/components/KaTeX.svelte';
+
 	import signature from './Poplmark.html?raw';
 </script>
 
 <svelte:head>
 	<title>Transitivity of Algorithmic Subtyping</title>
 </svelte:head>
+
+<KaTeX />
 
 {@html signature}
 

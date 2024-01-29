@@ -1,10 +1,14 @@
 <script>
+	import KaTeX from '$lib/components/KaTeX.svelte';
+
 	import signature from './Normalization_by_Evaluation.html?raw';
 </script>
 
 <svelte:head>
 	<title>Normalization by Evaluation</title>
 </svelte:head>
+
+<KaTeX />
 
 {@html signature}
 
