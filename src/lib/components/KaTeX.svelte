@@ -7,7 +7,7 @@
 <svelte:head>
 	<link rel="stylesheet" href={katexCss} />
 
-	<script src={katex}></script>
+	<script defer src={katex}></script>
 
 	<script defer src={katexAutoRender} onload="renderMathInElement(document.body);"></script>
 </svelte:head>
