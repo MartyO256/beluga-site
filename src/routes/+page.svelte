@@ -132,106 +132,12 @@
 
 <h2 id="installation">Installation</h2>
 
-<div class="row">
-	<div class="col-lg-4">
-		<div class="list-group mb-2">
-			<div class="list-group-item active">Prerequisite Packages</div>
-			<a href="http://ocaml.org/" target="_blank" class="list-group-item">OCaml 4.04+</a>
-			<a
-				href="http://opam.ocaml.org/packages/ocamlfind/ocamlfind.1.5.1/"
-				target="_blank"
-				class="list-group-item">ocamlfind</a
-			>
-			<a
-				href="https://opam.ocaml.org/packages/ulex/ulex.1.1/"
-				target="_blank"
-				class="list-group-item">ulex</a
-			>
-			<a
-				href="https://opam.ocaml.org/packages/extlib/extlib.1.6.1/"
-				target="_blank"
-				class="list-group-item">extlib</a
-			>
-			<a
-				href="https://opam.ocaml.org/packages/camlp4/camlp4.4.02.0/"
-				target="_blank"
-				class="list-group-item">camlp4 (for OCaml 4.02+ only)</a
-			>
-			<a href="http://www.gnu.org/software/make/" target="_blank" class="list-group-item">make</a>
-			<div class="list-group-item active">Optional Packages</div>
-			<a
-				href="http://www.oracle-base.com/articles/linux/rlwrap.php"
-				target="_blank"
-				class="list-group-item">rlwrap</a
-			>
-		</div>
-	</div>
-
-	<!--
-		<h2>Get Started</h2>
-	
-		<h3>Installation</h3>
-	
-		<div class="alert alert-info">
-			<strong>NOTE:</strong> These are only a few quick steps to get users up and running with Beluga.
-			Please refer to the
-			<strong
-				>full installation guide included with the distribution, <a
-					href="http://complogic.cs.mcgill.ca/beluga/install.html">available online</a
-				>
-			</strong> if you run into any issues.
-		</div>
-	
-		<ol>
-			<li>Install all the prerequisite packages.</li>
-			<li>
-				Clone Beluga from GitHub: <a href="https://github.com/Beluga-lang/Beluga.git"
-					>https://github.com/Beluga-lang/Beluga.git</a
-				>
-			</li>
-			<li>
-				From the Beluga directory, build the executable by using: <br />
-				<code>~/beluga# make</code> or <code>~/beluga# omake</code>
-			</li>
-			<li>
-				Use the executable located in the bin directory to run Beluga programs:
-				<ul>
-					<li>
-						Use <code>~/beluga# bin/beluga path/to/program.bel</code> to run a Beluga program.
-					</li>
-					<li>
-						Beluga includes a major mode for programming in Emacs. See <a
-							href="http://complogic.cs.mcgill.ca/beluga/install.html#exec"
-						>
-							here</a
-						>.
-					</li>
-					<li>
-						Run in an Emacs buffer to use the Interactive mode. See the Docs file for how to use the
-						Interactive mode commands.
-					</li>
-				</ul>
-			</li>
-		</ol>
-	
-		<h3>Bug reports</h3>
-	
-		<p>
-			For any bugs or issues, please, use the <a href="https://github.com/Beluga-lang/Beluga/issues"
-				>GitHub issue tracker</a
-			>.
-		</p>
-	-->
-
-	<div class="col-lg-8">
-		<p>
-			Please refer to the installation guide in the GitHub repository of Beluga:<br />
-			<a href="https://github.com/Beluga-lang/Beluga/blob/master/INSTALL">
-				https://github.com/Beluga-lang/Beluga/blob/master/INSTALL</a
-			>.
-		</p>
-	</div>
-</div>
+<p>
+	Please refer to the installation guide in the GitHub repository of Beluga:<br />
+	<a href="https://github.com/Beluga-lang/Beluga/blob/master/INSTALL">
+		https://github.com/Beluga-lang/Beluga/blob/master/INSTALL</a
+	>.
+</p>
 
 <h2>Funding</h2>
 
