@@ -82,7 +82,8 @@
 
 <ul>
 	<li>
-		<a href="beluga-tutorial.pdf">Mechanizing Meta-Theory in Beluga</a> (CADE-25 Tutorial), August 2015
+		<a href="{base}/beluga-tutorial.pdf">Mechanizing Meta-Theory in Beluga</a> (CADE-25 Tutorial), August
+		2015
 	</li>
 	<li>
 		<a href="https://github.com/Beluga-lang/Meta"
