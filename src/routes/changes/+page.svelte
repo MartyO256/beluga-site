@@ -153,21 +153,77 @@
 		<tr>
 			<td>2018</td>
 			<td>0.8.2</td>
-			<td
-				><code>
+			<td>
+				<code>
 					%{`{`}coverage, warncoverage, <br />
 					nostrengthen, infix, prefix, assoc, <br />
 					name, abbrev, not, open{`}`} ...
-				</code></td
-			>
-			<td
-				><code
+				</code>
+			</td>
+			<td>
+				<code
 					>--{`{`}coverage, warncoverage, <br />
 					nostrengthen, infix, prefix, assoc, <br />
 					name, abbrev, not, open{`}`} ...
-				</code></td
-			>
-			<td>Pragmas use -- instead of % (different syntax for pragmas and comments).</td>
+				</code>
+			</td>
+			<td>
+				Pragmas use <code>--</code> instead of <code>%</code> (different syntax for pragmas and comments)
+			</td>
+		</tr>
+
+		<tr>
+			<td>2023</td>
+			<td>1.1</td>
+			<td>
+				<code>$σ' : [g |- $σ, M]</code>
+			</td>
+			<td>
+				<code>$σ' : $[g |- $σ, M]</code>
+			</td>
+			<td>
+				Substitution types and objects require a <code>$</code> prefix.
+			</td>
+		</tr>
+
+		<tr>
+			<td>2023</td>
+			<td>1.1</td>
+			<td>
+				<code>$σ' : [g |-# $σ, M]</code>
+			</td>
+			<td>
+				<code>$σ' : $[g |-# $σ, M]</code>
+			</td>
+			<td>
+				Renaming substitution types and objects require a <code>$</code> prefix.
+			</td>
+		</tr>
+
+		<tr>
+			<td>2023</td>
+			<td>1.1</td>
+			<td>
+				<code>#p : [g |- tp]</code>
+			</td>
+			<td>
+				<code>#p : #[g |- tp]</code>
+			</td>
+			<td>
+				Parameter types and variables require a <code>#</code> prefix.
+			</td>
+		</tr>
+
+		<tr>
+			<td>2023</td>
+			<td>1.1</td>
+			<td>
+				<code>tl stream</code>
+			</td>
+			<td>
+				<code>stream .tl</code>
+			</td>
+			<td> Destructors for coinductive type families use postfix notation. </td>
 		</tr>
 	</tbody>
 </table>
